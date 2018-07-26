@@ -3,7 +3,6 @@
 namespace Migrator\Tests;
 
 use Carbon\Carbon;
-use DB;
 use Illuminate\Support\Facades\Artisan;
 use Migrator\Schema\Migrator\MigrationFile;
 
@@ -388,7 +387,7 @@ class MigratorTest extends BaseTestCase
     /** @test */
     public function numbered_types()
     {
-        /** @see https://laravel.com/docs/5.6/migrations#creating-columns */
+        /* @see https://laravel.com/docs/5.6/migrations#creating-columns */
 
         // char(100)
         // decimal(8, 2);
@@ -479,7 +478,7 @@ class MigratorTest extends BaseTestCase
     /** @test */
     public function many_to_many()
     {
-        $ns = $this->generateAndRun("
+        $ns = $this->generateAndRun('
             namespace {namespace}
             User
                 name: string
@@ -488,7 +487,7 @@ class MigratorTest extends BaseTestCase
             Role
                 name: string
                 users()
-        ");
+        ');
 
         //$this->dumpModels();
         $this->assertMigrationsContain("Schema::create('role_user', function (Blueprint \$table) {");
@@ -511,7 +510,7 @@ class MigratorTest extends BaseTestCase
     /** @test */
     public function m2m_with_timestamps()
     {
-        $ns = $this->generateAndRun("
+        $ns = $this->generateAndRun('
             namespace {namespace}
             User
                 name: string
@@ -520,7 +519,7 @@ class MigratorTest extends BaseTestCase
             Podcast
                 name: string
                 users() 
-        ");
+        ');
 
         $this->assertModelsContain("belongsToMany(\\$ns\Podcast::class, 'podcast_user')->withTimestamps();");
 
@@ -533,16 +532,16 @@ class MigratorTest extends BaseTestCase
     /** @test */
     public function m2m_timestamps()
     {
-        $ns = $this->generateAndRun("
+        $ns = $this->generateAndRun('
             namespace {namespace}
             User
                 name: string
-                podcasts(): Podcast[] As(\"subscription\"), PivotWithTimestamps
+                podcasts(): Podcast[] As("subscription"), PivotWithTimestamps
                 
             Podcast
                 name: string
                 users() 
-        ");
+        ');
 
         $this->assertModelsContain("belongsToMany(\\$ns\Podcast::class, 'podcast_user')->as('subscription')->withTimestamps();");
 
@@ -555,7 +554,7 @@ class MigratorTest extends BaseTestCase
     /** @test */
     public function m2m_model()
     {
-        $ns = $this->generateAndRun("
+        $ns = $this->generateAndRun('
             namespace {namespace}
             AssignedRole
                 role_pk1: unsignedInteger
@@ -571,7 +570,7 @@ class MigratorTest extends BaseTestCase
                 role_pk: integer
                 name: string
                 users(): User[] 
-        ");
+        ');
 
         $this->assertMigrationsContain("Schema::create('assigned_roles', function (Blueprint \$table) {");
         $this->assertMigrationsContain("\$table->unsignedInteger('user_pk1')->nullable();", 'assigned_roles');
@@ -609,7 +608,7 @@ class MigratorTest extends BaseTestCase
 
         $this->assertModelsContain("protected \$dates = [\n        'what_time',\n        'what_time2',\n        'what_time3',");
         $user = $this->newInstanceOf('User')->create([
-            'what_time' => Carbon::now(),
+            'what_time'  => Carbon::now(),
             'what_time2' => Carbon::now(),
             'what_time3' => Carbon::now(),
         ]);
@@ -636,7 +635,7 @@ class MigratorTest extends BaseTestCase
                 name: string Default("Mr.Y")
         ');
 
-        $u = $this->newInstanceOf("User");
+        $u = $this->newInstanceOf('User');
         $u->save();
         $this->assertEquals('Mr.Y', $u->fresh()->name);
     }
@@ -666,7 +665,6 @@ class MigratorTest extends BaseTestCase
         $user = $this->newInstanceOf('User')->create(['history' => [1, 2, 3]]);
         $this->assertEquals([1, 2, 3], $user->fresh()->history);
     }
-
 
     /** @test */
     public function works_with_jsonb()
@@ -772,12 +770,12 @@ class MigratorTest extends BaseTestCase
     /** @test */
     public function creates_indexes()
     {
-        $this->generateAndRun("
+        $this->generateAndRun('
             namespace {namespace}
             
             Item
                 title: string Index
-        ");
+        ');
 
         $this->assertMigrationsContain("\$table->index(['title'], 'items_title_idx');");
     }
@@ -785,12 +783,12 @@ class MigratorTest extends BaseTestCase
     /** @test */
     public function creates_indexes1()
     {
-        $this->generateAndRun("
+        $this->generateAndRun('
             namespace {namespace}
             
             Item
                 title: string Index(i1_idx)
-        ");
+        ');
 
         $this->assertMigrationsContain("\$table->index(['title'], 'i1_idx')");
     }
@@ -798,12 +796,12 @@ class MigratorTest extends BaseTestCase
     /** @test */
     public function creates_indexes2()
     {
-        $this->generateAndRun("
+        $this->generateAndRun('
             namespace {namespace}
             
             Item
                 title: string
-        ");
+        ');
 
         $this->assertMigrationsNotContain("\$table->index(['title'], 'items_title_idx')");
         $this->assertIndexNotExists('items', 'items_title_idx');
@@ -845,14 +843,14 @@ class MigratorTest extends BaseTestCase
     /** @test */
     public function creates_index_with_multiple_fields()
     {
-        $this->generateButDontRun("
+        $this->generateButDontRun('
             namespace {namespace}
             
             Item
                 title: string Index
                 price: decimal(8, 2) Index(price_idx)
                 price2: decimal(8, 2) Index(price_idx)
-        ");
+        ');
 
         $this->assertMigrationsContain("\$table->decimal('price', 8, 2)->nullable();");
         $this->assertMigrationsContain("\$table->index(['price', 'price2'], 'price_idx');");
@@ -869,29 +867,29 @@ class MigratorTest extends BaseTestCase
     /** @test */
     public function changes_fields_definitions_nullable()
     {
-        $this->generateAndRun("
+        $this->generateAndRun('
             namespace {namespace}
             
             Item
                 price: integer
-        ");
+        ');
 
-        $this->generateAndRun("
+        $this->generateAndRun('
             namespace {namespace}
             
             Item
                 price: integer NotNull
-        ");
+        ');
         $this->assertCount(1, $this->migrator->migrationsCreated);
         $this->assertMigrationsContain("public function up()\n    {\n        Schema::table('items', function (Blueprint \$table) {\n            \$table->integer('price')->nullable(false)->change();");
         $this->assertMigrationsContain("public function down()\n    {\n        Schema::table('items', function (Blueprint \$table) {\n            \$table->integer('price')->nullable(true)->change();");
 
-        $this->generateAndRun("
+        $this->generateAndRun('
             namespace {namespace}
             
             Item
                 price: integer NotNull
-        ");
+        ');
 
         $this->assertEquals([], $this->migrator->migrationsCreated);
     }
@@ -921,7 +919,7 @@ class MigratorTest extends BaseTestCase
                 user() via user_id
         ');
 
-        $this->assertContains('phone()', $this->getModelContents("User"));
+        $this->assertContains('phone()', $this->getModelContents('User'));
         //$this->dumpModels();
 
         $user = $this->newInstanceOf('User')->create();
@@ -966,7 +964,7 @@ class MigratorTest extends BaseTestCase
                 user() via user_id
         ');
 
-        $this->assertContains('phone()', $this->getModelContents("User"));
+        $this->assertContains('phone()', $this->getModelContents('User'));
         //$this->dumpModels();
 
         $user = $this->newInstanceOf('User')->create();
@@ -1200,12 +1198,12 @@ class MigratorTest extends BaseTestCase
     /** @test */
     public function creates_unique()
     {
-        $this->generateAndRun("
+        $this->generateAndRun('
             namespace {namespace}
             
             Item
                 title: string Unique
-        ");
+        ');
 
         $this->assertMigrationsContain("\$table->unique(['title'], 'items_title_unique_idx');");
     }
@@ -1213,12 +1211,12 @@ class MigratorTest extends BaseTestCase
     /** @test */
     public function creates_unique1()
     {
-        $this->generateAndRun("
+        $this->generateAndRun('
             namespace {namespace}
             
             Item
                 title: string Unique(i1_idx)
-        ");
+        ');
 
         $this->assertMigrationsContain("\$table->unique(['title'], 'i1_idx')");
     }
@@ -1226,12 +1224,12 @@ class MigratorTest extends BaseTestCase
     /** @test */
     public function creates_unique2()
     {
-        $this->generateAndRun("
+        $this->generateAndRun('
             namespace {namespace}
             
             Item
                 title: string
-        ");
+        ');
 
         $this->assertMigrationsNotContain("\$table->unique(['title'], 'items_title_unique_idx')");
         $this->assertIndexNotExists('items', 'items_title_unique_idx');
@@ -1309,7 +1307,7 @@ class MigratorTest extends BaseTestCase
     /** @test */
     public function m2m_model_join()
     {
-        $ns = $this->generateAndRun("
+        $ns = $this->generateAndRun('
             namespace {namespace}
             User
                 user_pk: integer
@@ -1320,7 +1318,7 @@ class MigratorTest extends BaseTestCase
                 role_pk: integer
                 name: string
                 users(): User[] 
-        ");
+        ');
 
         //$this->dumpModels();
         $this->assertMigrationsContain("Schema::create('assigned_roles', function (Blueprint \$table) {");
@@ -1343,7 +1341,7 @@ class MigratorTest extends BaseTestCase
     /** @test */
     public function many_to_many_pk()
     {
-        $ns = $this->generateAndRun("
+        $ns = $this->generateAndRun('
             namespace {namespace}
             User
                 user_pk: increments PrimaryKey
@@ -1354,7 +1352,7 @@ class MigratorTest extends BaseTestCase
                 role_pk: increments PrimaryKey
                 name: string
                 users()
-        ");
+        ');
 
         $this->assertMigrationsContain("Schema::create('role_user', function (Blueprint \$table) {");
         $this->assertMigrationsContain("\$table->unsignedInteger('user_id');");
@@ -1370,8 +1368,8 @@ class MigratorTest extends BaseTestCase
 
         $this->assertTableExists('role_user');
 
-        $role = $this->newInstanceOf("Role")->create(['name' => 'Admin']);
-        $user = $this->newInstanceOf("User")->create(['name' => 'Mr X']);
+        $role = $this->newInstanceOf('Role')->create(['name' => 'Admin']);
+        $user = $this->newInstanceOf('User')->create(['name' => 'Mr X']);
         $this->assertEquals(0, $user->roles()->count());
         $user->roles()->attach($role);
         $this->assertEquals(1, $user->roles()->count());
@@ -1381,7 +1379,7 @@ class MigratorTest extends BaseTestCase
     /** @test */
     public function many_to_many_pk1()
     {
-        $ns = $this->generateAndRun("
+        $ns = $this->generateAndRun('
             namespace {namespace}
             User
                 name: string
@@ -1391,10 +1389,10 @@ class MigratorTest extends BaseTestCase
                 role_pk: increments PrimaryKey
                 name: string
                 users()
-        ");
+        ');
 
-        $role = $this->newInstanceOf("Role")->create(['name' => 'Admin']);
-        $user = $this->newInstanceOf("User")->create(['name' => 'Mr X']);
+        $role = $this->newInstanceOf('Role')->create(['name' => 'Admin']);
+        $user = $this->newInstanceOf('User')->create(['name' => 'Mr X']);
         $this->assertEquals(0, $user->roles()->count());
         $user->roles()->attach($role);
         $this->assertEquals(1, $user->roles()->count());
@@ -1404,7 +1402,7 @@ class MigratorTest extends BaseTestCase
     /** @test */
     public function many_to_many_pk2()
     {
-        $this->generateAndRun("
+        $this->generateAndRun('
             namespace {namespace}
             User
                 user_pk: increments PrimaryKey
@@ -1414,10 +1412,10 @@ class MigratorTest extends BaseTestCase
             Role
                 name: string
                 users()
-        ");
+        ');
 
-        $role = $this->newInstanceOf("Role")::create(['name' => 'Admin']);
-        $user = $this->newInstanceOf("User")::create(['name' => 'Mr X']);
+        $role = $this->newInstanceOf('Role')::create(['name' => 'Admin']);
+        $user = $this->newInstanceOf('User')::create(['name' => 'Mr X']);
         $this->assertEquals(0, $user->roles()->count());
         $user->roles()->attach($role);
         $this->assertEquals(1, $user->roles()->count());
@@ -1428,8 +1426,7 @@ class MigratorTest extends BaseTestCase
     public function has_many_through()
     {
         /** @see https://laravel.com/docs/5.6/eloquent-relationships#has-many-through */
-
-        $ns = $this->generateAndRun("
+        $ns = $this->generateAndRun('
             namespace {namespace}
             Country
                 name: string
@@ -1444,7 +1441,7 @@ class MigratorTest extends BaseTestCase
             Post
                 title: string
                 user()
-        ");
+        ');
 
         $this->assertMigrationsNotContain('User', 'countries');
         $this->assertModelsContain(
@@ -1452,7 +1449,7 @@ class MigratorTest extends BaseTestCase
             'country'
         );
 
-        $country = $this->newInstanceOf("Country")->create(['name' => 'Sweden']);
+        $country = $this->newInstanceOf('Country')->create(['name' => 'Sweden']);
         $user = $country->users()->create(['name' => 'Johansson']);
         $user->posts()->create(['title' => 'It is great weather in Sweden in summer']);
 
@@ -1462,7 +1459,7 @@ class MigratorTest extends BaseTestCase
     /** @test */
     public function has_many_through_complex()
     {
-        $ns = $this->generateAndRun("
+        $ns = $this->generateAndRun('
             namespace {namespace}
             Country
                 country_pk: increments PrimaryKey
@@ -1480,7 +1477,7 @@ class MigratorTest extends BaseTestCase
                 post_pk: increments PrimaryKey
                 title: string
                 user()
-        ");
+        ');
 
         $this->assertMigrationsNotContain('User', 'countries');
         $this->assertModelsContain(
@@ -1488,7 +1485,7 @@ class MigratorTest extends BaseTestCase
             'country'
         );
 
-        $country = $this->newInstanceOf("Country")->create(['name' => 'Sweden']);
+        $country = $this->newInstanceOf('Country')->create(['name' => 'Sweden']);
         $user = $country->users()->create(['name' => 'Johansson']);
         $user->posts()->create(['title' => 'It is great weather in Sweden in summer']);
 
@@ -1499,8 +1496,7 @@ class MigratorTest extends BaseTestCase
     public function polymorphic_relations()
     {
         /** @see https://laravel.com/docs/5.6/eloquent-relationships#polymorphic-relations */
-
-        $ns = $this->generateAndRun("
+        $ns = $this->generateAndRun('
             namespace {namespace}
             
             Post
@@ -1515,12 +1511,12 @@ class MigratorTest extends BaseTestCase
                 body: string
                 commentable(): Post|Video
             
-        ");
+        ');
 
-        $post = $this->newInstanceOf("Post")->create(['title' => 'Summer in Tuscany']);
+        $post = $this->newInstanceOf('Post')->create(['title' => 'Summer in Tuscany']);
         $post->comments()->create(['body' => 'I love it!']);
 
-        $video = $this->newInstanceOf("Post")->create(['title' => 'Magic Trick']);
+        $video = $this->newInstanceOf('Post')->create(['title' => 'Magic Trick']);
         $video->comments()->create(['body' => 'How did he do it?']);
 
         $this->assertEquals(['I love it!'], $post->fresh()->comments->pluck('body')->all());
@@ -1530,7 +1526,7 @@ class MigratorTest extends BaseTestCase
     /** @test */
     public function polymorphic_relations_complex()
     {
-        $ns = $this->generateAndRun("
+        $ns = $this->generateAndRun('
             namespace {namespace}
             
             Post
@@ -1548,12 +1544,12 @@ class MigratorTest extends BaseTestCase
                 body: string
                 commentable(): Post|Video
             
-        ");
+        ');
 
-        $post = $this->newInstanceOf("Post")->create(['title' => 'Summer in Tuscany']);
+        $post = $this->newInstanceOf('Post')->create(['title' => 'Summer in Tuscany']);
         $post->comments()->create(['body' => 'I love it!']);
 
-        $video = $this->newInstanceOf("Post")->create(['title' => 'Magic Trick']);
+        $video = $this->newInstanceOf('Post')->create(['title' => 'Magic Trick']);
         $comment2 = $video->comments()->create(['body' => 'How did he do it?']);
 
         $this->assertEquals(['I love it!'], $post->first()->comments->pluck('body')->all());
@@ -1566,7 +1562,7 @@ class MigratorTest extends BaseTestCase
     /** @test */
     public function many_to_many_polymorphic_relations()
     {
-        $ns = $this->generateAndRun("
+        $ns = $this->generateAndRun('
             namespace {namespace}
             Post
                 name: string
@@ -1585,19 +1581,19 @@ class MigratorTest extends BaseTestCase
             Taggable
                 tag()
                 taggable(): Post|Video
-        ");
+        ');
 
-        $post = $this->newInstanceOf("Post")->create(['name' => 'Summer in Tuscany']);
+        $post = $this->newInstanceOf('Post')->create(['name' => 'Summer in Tuscany']);
         $post->tags()->create(['name' => 'tag1']);
 
-        $video = $this->newInstanceOf("Video")->create(['name' => 'Magic Trick']);
+        $video = $this->newInstanceOf('Video')->create(['name' => 'Magic Trick']);
         $video->tags()->create(['name' => 'tag2']);
 
         $this->assertEquals(['tag1'], $post->first()->tags->pluck('name')->all());
         $this->assertEquals(['tag2'], $video->fresh()->tags->pluck('name')->all());
 
-        $this->assertEquals([$post->name], $this->newInstanceOf("Tag")->first()->posts()->pluck('name')->all());
-        $tag2 = $this->newInstanceOf("Tag")->where('name', 'tag2')->first();
+        $this->assertEquals([$post->name], $this->newInstanceOf('Tag')->first()->posts()->pluck('name')->all());
+        $tag2 = $this->newInstanceOf('Tag')->where('name', 'tag2')->first();
         $this->assertEquals([$video->name], $tag2->videos()->pluck('name')->all());
     }
 
@@ -1606,7 +1602,7 @@ class MigratorTest extends BaseTestCase
     {
         $this->expectExceptionMessage('Currently, we don\'t support polymorphic many-to-many with custom Primary Key ');
 
-        $ns = $this->generateAndRun("
+        $ns = $this->generateAndRun('
             namespace {namespace}
             Post
                 post_pk: increments PrimaryKey
@@ -1629,19 +1625,19 @@ class MigratorTest extends BaseTestCase
                 taggable_pk: increments PrimaryKey
                 tag()
                 taggable(): Post|Video
-        ");
+        ');
 
-        $post = $this->newInstanceOf("Post")->create(['name' => 'Summer in Tuscany']);
+        $post = $this->newInstanceOf('Post')->create(['name' => 'Summer in Tuscany']);
         $post->tags()->create(['name' => 'tag1']);
 
-        $video = $this->newInstanceOf("Video")->create(['name' => 'Magic Trick']);
+        $video = $this->newInstanceOf('Video')->create(['name' => 'Magic Trick']);
         $video->tags()->create(['name' => 'tag2']);
 
         $this->assertEquals(['tag1'], $post->first()->tags->pluck('name')->all());
         $this->assertEquals(['tag2'], $video->fresh()->tags->pluck('name')->all());
 
-        $this->assertEquals([$post->name], $this->newInstanceOf("Tag")->first()->posts()->pluck('name')->all());
-        $tag2 = $this->newInstanceOf("Tag")->where('name', 'tag2')->first();
+        $this->assertEquals([$post->name], $this->newInstanceOf('Tag')->first()->posts()->pluck('name')->all());
+        $tag2 = $this->newInstanceOf('Tag')->where('name', 'tag2')->first();
         $this->assertEquals([$video->name], $tag2->videos()->pluck('name')->all());
     }
 }

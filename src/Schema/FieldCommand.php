@@ -30,28 +30,28 @@ class FieldCommand extends Command
         $line = preg_replace('#,\s*\r?\n\s+#', ', ', $line);
 
         // id_field: big_integer PrimaryKey, Index, Unique, Index(idxi), Unique(idxu), NotNull
-        $nameRx = "(?P<name>[A-Za-z0-9_]+)";
+        $nameRx = '(?P<name>[A-Za-z0-9_]+)';
 
         $numbersRx = '(?P<param1>\d+(,\s*(?P<param2>\d+))?)';
         $enumRx = '(?P<enum_type>enum)\((?P<enum_param>.*?)\)'; // this is too naive, ) could be inside of parentheses
         $typeRx = "($enumRx|(?P<numbered_type>[A-Za-z_]+)\($numbersRx\)|(?P<type>[A-Za-z_]+))";
-        $tagsRx = "(?P<tags>(.*))";
+        $tagsRx = '(?P<tags>(.*))';
         $regex = "#^{$nameRx}\\:\s*{$typeRx}(\s+$tagsRx)?$#";
 
         if (!preg_match($regex, $line, $m)) {
-            return null;
+            return;
         }
 
-        $fieldType = array_get($m, 'type', '') . array_get($m, 'numbered_type', '') . array_get($m, 'enum_type', '');
+        $fieldType = array_get($m, 'type', '').array_get($m, 'numbered_type', '').array_get($m, 'enum_type', '');
 
         $d = new self($m['name'], $fieldType);
         $d->setModel($model);
         $d->parseTags(array_get($m, 'tags'));
         if (isset($m['param1'])) {
-            $d->setParam1((int)$m['param1']);
+            $d->setParam1((int) $m['param1']);
         }
         if (isset($m['param2'])) {
-            $d->setParam2((int)$m['param2']);
+            $d->setParam2((int) $m['param2']);
         }
         if (!empty($m['enum_param'])) {
             $d->setParam1($m['enum_param']);
@@ -80,13 +80,13 @@ class FieldCommand extends Command
         $tags = preg_split('#,\s*#', $tagString); // TODO: probably too naive
         foreach ($tags as $tag) {
             if (preg_match($indexWithoutNameRx, $tag, $m1)) {
-                $this->indexNames [] = $this->getModel()->getTableName() . '_' . $this->name . '_idx';
+                $this->indexNames[] = $this->getModel()->getTableName().'_'.$this->name.'_idx';
             } elseif (preg_match($uniqueWithoutNameRx, $tag, $m1)) {
-                $this->uniqueIndexNames [] = $this->getModel()->getTableName() . '_' . $this->name . '_unique_idx';
+                $this->uniqueIndexNames[] = $this->getModel()->getTableName().'_'.$this->name.'_unique_idx';
             } elseif (preg_match($indexWithNameRx, $tag, $m1)) {
-                $this->indexNames [] = $m1['name'];
+                $this->indexNames[] = $m1['name'];
             } elseif (preg_match($uniqueWithNameRx, $tag, $m1)) {
-                $this->uniqueIndexNames [] = $m1['name'];
+                $this->uniqueIndexNames[] = $m1['name'];
             } elseif (preg_match($primaryKeyRx, $tag, $m1)) {
                 $this->isPrimaryKey = true;
             } elseif (preg_match($notNullRx, $tag, $m1)) {
@@ -156,12 +156,14 @@ class FieldCommand extends Command
     public function isGuardedConsideringDefaults()
     {
         $guarded = $this->isGuarded !== null ? $this->isGuarded : $this->getSchema()->getDefaultIsGuarded();
+
         return $guarded;
     }
 
     public function getTableDefinitionField()
     {
         $nullable = $this->isNullable !== null ? $this->isNullable : $this->getSchema()->getDefaultIsNullable();
+
         return new Field(
             $this->getModel()->getTableName(),
             $this->getName(),
@@ -232,11 +234,11 @@ class FieldCommand extends Command
 
     public function getQuotedName()
     {
-        return "'" . addslashes($this->name) . "'";
+        return "'".addslashes($this->name)."'";
     }
 
     public function humanName()
     {
-        return $this->getModel()->getShortName() . '.' . $this->name;
+        return $this->getModel()->getShortName().'.'.$this->name;
     }
 }

@@ -14,7 +14,7 @@ class MigratorServiceProvider extends ServiceProvider
     public function register()
     {
         $this->commands([
-            MigratorCommand::class
+            MigratorCommand::class,
         ]);
     }
 

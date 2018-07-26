@@ -17,9 +17,7 @@ use Migrator\Schema\Parser;
 use Migrator\Schema\Schema;
 
 /**
- * Compares the current state and generates migration and creates/updates models files
- *
- * @package Migrator
+ * Compares the current state and generates migration and creates/updates models files.
  */
 class Migrator
 {
@@ -77,10 +75,10 @@ class Migrator
         foreach ($this->schema->getModels() as $model) {
             foreach ($model->getTables() as $table) {
                 if (!$this->db->hasTable($table->getName())) {
-                    $this->schemaChanges [] = [self::CREATE_TABLE, $table];
+                    $this->schemaChanges[] = [self::CREATE_TABLE, $table];
                 } else {
                     if ($table = $this->filterTableForUpdate($table)) {
-                        $this->schemaChanges [] = [self::UPDATE_TABLE, $table];
+                        $this->schemaChanges[] = [self::UPDATE_TABLE, $table];
                     }
                 }
             }
@@ -89,7 +87,7 @@ class Migrator
         foreach ($this->schema->getModels() as $model) {
             foreach ($model->getImplicitPivotTables() as $table) {
                 if (!$this->db->hasTable($table->getName())) {
-                    $this->schemaChanges [] = [self::CREATE_TABLE, $table];
+                    $this->schemaChanges[] = [self::CREATE_TABLE, $table];
                 }
                 // no else, we don't update implicit table
             }
@@ -103,10 +101,10 @@ class Migrator
         foreach ($this->schemaChanges as $change) {
             if ($change[0] == self::CREATE_TABLE || $change[0] == self::UPDATE_TABLE) {
                 [$filename, $contents] = MigrationFile::build($change[1], $change[0] == self::UPDATE_TABLE);
-                $fullPath = realpath(database_path("migrations/")) . DIRECTORY_SEPARATOR . $filename;
+                $fullPath = realpath(database_path('migrations/')).DIRECTORY_SEPARATOR.$filename;
                 $change['filename'] = $fullPath;
                 file_put_contents($fullPath, $contents);
-                $this->createdFileNames [] = $change['filename'];
+                $this->createdFileNames[] = $change['filename'];
                 $this->migrationsCreated[$fullPath] = $contents;
             }
         }
@@ -131,7 +129,7 @@ class Migrator
         foreach ($this->schema->getModels() as $model) {
             $modelFile = ModelFile::build($model);
 
-            $fullPath = $this->schema->getPathForNamespace($model->getNamespace()) . $modelFile->getFilename();
+            $fullPath = $this->schema->getPathForNamespace($model->getNamespace()).$modelFile->getFilename();
             $path = dirname($fullPath);
             if (!file_exists($path)) {
                 mkdir($path, 0755, true);
@@ -139,12 +137,12 @@ class Migrator
 
             $contents = $modelFile->render();
             if (!file_exists($fullPath) || $this->overwriteModels) {
-                $this->createdFileNames [] = $fullPath;
+                $this->createdFileNames[] = $fullPath;
                 file_put_contents($fullPath, $contents);
                 $this->modelsCreated[$fullPath] = $contents;
             } else {
                 if (!$this->mergeModelFiles($fullPath, $modelFile)) {
-                    $this->warnings [] = "Can't merge `$fullPath`";
+                    $this->warnings[] = "Can't merge `$fullPath`";
                 } else {
                     $this->modelsUpdated[$fullPath] = file_get_contents($fullPath);
                 }
@@ -200,8 +198,6 @@ class Migrator
             count($table->getCommands()) > 0) {
             return $table;
         }
-
-        return null;
     }
 
     private function shouldUpdateField(TableDefinition $table, Field $field)
@@ -222,12 +218,14 @@ class Migrator
     public function indexExists($tableName, $indexName)
     {
         $indexes = $this->getSchemaManager()->listTableIndexes($tableName);
+
         return isset($indexes[$indexName]);
     }
 
     public function uniqueExists($tableName, $indexName)
     {
         $indexes = $this->getSchemaManager()->listTableIndexes($tableName);
+
         return isset($indexes[$indexName]);
     }
 
@@ -248,9 +246,11 @@ class Migrator
     {
         try {
             (new MergeModelFiles($fullPath, $model))->merge();
+
             return true;
         } catch (\RuntimeException $e) {
-            $this->warnings [] = "$fullPath: " . $e->getMessage();
+            $this->warnings[] = "$fullPath: ".$e->getMessage();
+
             return false;
         }
     }

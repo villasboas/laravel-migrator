@@ -52,10 +52,10 @@ class Field
     {
         $params = '';
         if ($this->typeParam1) {
-            $params = ', ' . $this->typeParam1;
+            $params = ', '.$this->typeParam1;
         }
         if ($this->typeParam2) {
-            $params .= ', ' . $this->typeParam2;
+            $params .= ', '.$this->typeParam2;
         }
         $type = $this->type;
         if ($type == 'collection') {
@@ -68,21 +68,22 @@ class Field
         if ($this->nullable && !$this->exists) {
             $def .= '->nullable()';
         } elseif ($this->exists) {
-            $def .= '->nullable(' . ($this->nullable ? 'true' : 'false') . ')';
+            $def .= '->nullable('.($this->nullable ? 'true' : 'false').')';
         }
         if ($this->default) {
-            $def .= '->default(' . $this->default . ')';
+            $def .= '->default('.$this->default.')';
         }
         if ($this->exists) {
             $def .= '->change()';
         }
+
         return $def;
     }
 
     public function getLaravelDownCall()
     {
         if ($this->exists) {
-            $f2 = new Field(
+            $f2 = new self(
                 $this->tableName,
                 $this->getName(),
                 $this->type,
@@ -92,9 +93,11 @@ class Field
                 $this->default
             );
             $f2->setExists(true);
+
             return $f2->getLaravelMigrationCall();
         }
-        return "->dropColumn('" . addslashes($this->getName()) . "')";
+
+        return "->dropColumn('".addslashes($this->getName())."')";
     }
 
     /**
@@ -142,17 +145,20 @@ class Field
     public function isCurrentlyNullable()
     {
         $column = $this->getFieldDoctrine();
+
         return !$column->getNotnull();
     }
 
     /**
      * @param $tableName
      * @param $fieldName
+     *
      * @return \Doctrine\DBAL\Schema\Column
      */
     private function getFieldDoctrine(): \Doctrine\DBAL\Schema\Column
     {
         $tableName = $this->tableName;
+
         return $this->getSchemaManager()->listTableColumns($tableName)[$this->getName()];
     }
 

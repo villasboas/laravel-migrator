@@ -29,9 +29,9 @@ class BaseTestCase extends TestCase
     {
         $app['config']->set('database.default', 'testbench');
         $app['config']->set('database.connections.testbench', [
-            'driver' => 'sqlite',
+            'driver'   => 'sqlite',
             'database' => ':memory:',
-            'prefix' => '',
+            'prefix'   => '',
         ]);
     }
 
@@ -42,12 +42,12 @@ class BaseTestCase extends TestCase
     {
         $app['config']->set('database.default', 'testbench');
         $app['config']->set('database.connections.testbench', [
-            'driver' => 'pgsql',
+            'driver'   => 'pgsql',
             'database' => 'testbench',
-            'host' => '127.0.0.1',
+            'host'     => '127.0.0.1',
             'username' => getenv('USER'),
             'password' => '',
-            'charset' => 'utf8',
+            'charset'  => 'utf8',
         ]);
     }
 
@@ -58,12 +58,12 @@ class BaseTestCase extends TestCase
     {
         $app['config']->set('database.default', 'testbench');
         $app['config']->set('database.connections.testbench', [
-            'driver' => 'mysql',
+            'driver'   => 'mysql',
             'database' => 'testbench',
-            'host' => '127.0.0.1',
+            'host'     => '127.0.0.1',
             'username' => 'root',
             'password' => '',
-            'charset' => 'utf8',
+            'charset'  => 'utf8',
         ]);
     }
 
@@ -75,13 +75,13 @@ class BaseTestCase extends TestCase
         // create database testbench
         $app['config']->set('database.default', 'testbench');
         $app['config']->set('database.connections.testbench', [
-            'driver' => 'sqlsrv',
-            'host' => '127.0.0.1',
+            'driver'   => 'sqlsrv',
+            'host'     => '127.0.0.1',
             'database' => 'testbench',
             'username' => 'sa',
             'password' => 'aVeryComplexPassword99!', // MS requires complex password
-            'prefix' => '',
-            'options' => [\PDO::ATTR_PERSISTENT => true],
+            'prefix'   => '',
+            'options'  => [\PDO::ATTR_PERSISTENT => true],
         ]);
     }
 }

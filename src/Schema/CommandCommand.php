@@ -23,18 +23,20 @@ class CommandCommand extends Command
         $renameIndexRx = "/RENAME\s+INDEX\s+{$arg1Rx}\s+TO\s+{$arg2Rx}/";
         $deleteIndexRx = "/DELETE\s+INDEX\s+{$arg1Rx}/";
 
-        $d = new self;
+        $d = new self();
 
         if (preg_match($renameIndexRx, $line, $m)) {
             $d->setSubType('RenameIndex');
             $d->setArg1($m['arg1']);
             $d->setArg2($m['arg2']);
+
             return $d;
         }
 
         if (preg_match($deleteIndexRx, $line, $m)) {
             $d->setSubType('DeleteIndex');
             $d->setArg1($m['arg1']);
+
             return $d;
         }
 
@@ -42,16 +44,16 @@ class CommandCommand extends Command
             $d->setSubType('RenameField');
             $d->setArg1($m['arg1']);
             $d->setArg2($m['arg2']);
+
             return $d;
         }
 
         if (preg_match($deleteFieldRx, $line, $m)) {
             $d->setSubType('DeleteField');
             $d->setArg1($m['arg1']);
+
             return $d;
         }
-
-        return null;
     }
 
     public function getCommandType()

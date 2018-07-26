@@ -2,8 +2,7 @@
 
 /** @var Migrator\Schema\Migrator\TableDefinition $t */
 /** @var string $class */
-/** @var boolean $isChange */
-
+/** @var bool $isChange */
 $commands = '';
 if ($t->getCommands()) {
     // commands seem to require separate ::table call
@@ -68,10 +67,10 @@ foreach ($t->getUnique() as $name => $fields1) {
     $createIndexes .= "            \$table->unique([$names], '$name');\n";
 }
 
-$schemaStart = "";
-$schemaEnd = "";
+$schemaStart = '';
+$schemaEnd = '';
 
-if ("{$fields}{$timestamps}{$createIndexes}" != "") {
+if ("{$fields}{$timestamps}{$createIndexes}" != '') {
     $schemaStart = "        Schema::{$action}('{$t->getName()}', function (Blueprint \$table) {\n";
     $schemaEnd = "\n        });";
 }

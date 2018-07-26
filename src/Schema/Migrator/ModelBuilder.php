@@ -38,15 +38,15 @@ class ModelBuilder
 
     public function render()
     {
-        return "<?php\n" .
-            "namespace {$this->namespaceStmt()};\n" .
-            "\n" .
-            $this->use1() . "\n" .
-            "\n" .
-            "class {$this->name} extends {$this->extendsStmt()}\n{\n" .
-            $this->guarded() . $this->primaryKey() . $this->casts() . $this->dates() . "\n" .
-            $this->methods() . "\n" .
-            "}";
+        return "<?php\n".
+            "namespace {$this->namespaceStmt()};\n".
+            "\n".
+            $this->use1()."\n".
+            "\n".
+            "class {$this->name} extends {$this->extendsStmt()}\n{\n".
+            $this->guarded().$this->primaryKey().$this->casts().$this->dates()."\n".
+            $this->methods()."\n".
+            '}';
     }
 
     private function namespaceStmt()
@@ -82,19 +82,20 @@ class ModelBuilder
     private function quote($fields)
     {
         return array_map(function ($i) {
-            return "'" . addslashes($i) . "'";
+            return "'".addslashes($i)."'";
         }, $fields);
     }
 
     public function guarded($fields = null)
     {
-        $guardedFields = join(', ', $this->quote($fields ?? $this->guardedFieldNames()));
+        $guardedFields = implode(', ', $this->quote($fields ?? $this->guardedFieldNames()));
+
         return $guarded = "    protected \$guarded = [$guardedFields];\n";
     }
 
     private function primaryKey()
     {
-        $primaryKey = "";
+        $primaryKey = '';
         if ($this->model->getPrimaryKeyFieldNames() != ['id']) {
             $pk = $this->model->getPrimaryKeyFieldNamesExpectOne("model generation of `{$this->model->getShortName()}` requires simple Primary Key");
             $primaryKey = "    protected \$primaryKey = '$pk';\n";
@@ -113,6 +114,7 @@ class ModelBuilder
                 $res[$field->getName()] = $type;
             }
         }
+
         return $res;
     }
 
@@ -125,7 +127,7 @@ class ModelBuilder
             foreach ($toCast as $name => $type) {
                 $casts .= "        '$name' => '$type',\n";
             }
-            $casts .= "    ];";
+            $casts .= '    ];';
         }
 
         return $casts;
@@ -139,7 +141,7 @@ class ModelBuilder
             foreach ($fields as $field) {
                 $dates .= "        '{$field->getName()}',\n";
             }
-            $dates .= "    ];";
+            $dates .= '    ];';
         }
 
         return $dates;
@@ -147,7 +149,7 @@ class ModelBuilder
 
     public function methods()
     {
-        return join("\n\n", $this->singleMethods());
+        return implode("\n\n", $this->singleMethods());
     }
 
     public function singleMethods()
@@ -157,7 +159,7 @@ class ModelBuilder
         foreach ($this->model->getMethods() as $method) {
             $txt = "    public function {$method->getName()}()\n    {\n";
             $txt .= "        return \$this->{$method->laravelRelationCall()};\n";
-            $txt .= "    }";
+            $txt .= '    }';
             $methods[$method->getName()] = $txt;
         }
 
