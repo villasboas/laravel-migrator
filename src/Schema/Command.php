@@ -17,8 +17,10 @@ abstract class Command
     {
         if (empty($this->model)) {
             $name = isset($this->name) ? $this->name : '(no name)';
+
             throw new \RuntimeException("Model hasn't been set for {$this->getCommandType()} named '$name'");
         }
+
         return $this->model;
     }
 
@@ -41,8 +43,10 @@ abstract class Command
     {
         if (empty($this->schema)) {
             $name = isset($this->name) ? $this->name : '(no name)';
+
             throw new \RuntimeException("Schema hasn't been set for {$this->getCommandType()} named '$name'");
         }
+
         return $this->schema;
     }
 

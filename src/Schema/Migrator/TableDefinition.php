@@ -26,7 +26,7 @@ class TableDefinition
 
     public function addField(Field $field)
     {
-        $this->fields [] = $field;
+        $this->fields[] = $field;
     }
 
     /**
@@ -97,7 +97,7 @@ class TableDefinition
 
     public function addCommand(CommandCommand $command)
     {
-        $this->commands [] = $command;
+        $this->commands[] = $command;
     }
 
     /**

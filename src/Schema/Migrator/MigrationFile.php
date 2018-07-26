@@ -12,26 +12,28 @@ class MigrationFile
 
         $n = 0;
         do {
-            $class = "Create" . studly_case($t->getName()) . "Table" . ($n > 0 ? "{$n}" : "");
+            $class = 'Create'.studly_case($t->getName()).'Table'.($n > 0 ? "{$n}" : '');
             if ($isChange) {
-                $class = "Update" . studly_case($t->getName()) . "Table" . ($n > 0 ? "{$n}" : "");
+                $class = 'Update'.studly_case($t->getName()).'Table'.($n > 0 ? "{$n}" : '');
             }
             $n++;
         } while (isset($classes[$class]) || class_exists($class) || self::classFileExists($class));
 
-        $filename = sprintf("%s%03d_%s.php", date('Y_m_d_His'), self::$migrationNumber, snake_case($class));
-        $contents = require __DIR__ . '/migration_template.php';
+        $filename = sprintf('%s%03d_%s.php', date('Y_m_d_His'), self::$migrationNumber, snake_case($class));
+        $contents = require __DIR__.'/migration_template.php';
         self::$migrationNumber++;
+
         return [$filename, $contents];
     }
 
     /**
      * @param $class
+     *
      * @return bool
      */
     public static function classFileExists($class): bool
     {
-        return count(glob(database_path('migrations/*_' . snake_case($class) . '.php'))) > 0;
+        return count(glob(database_path('migrations/*_'.snake_case($class).'.php'))) > 0;
     }
 
     /**
@@ -46,6 +48,7 @@ class MigrationFile
                 $classes[$m[1]] = true;
             }
         }
+
         return $classes;
     }
 }

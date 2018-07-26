@@ -16,11 +16,12 @@ class DefaultCommand extends Command
         $regex = '#^default (?P<tags>.*)$#i';
 
         if (!preg_match($regex, $line, $m)) {
-            return null;
+            return;
         }
 
         $tags = preg_split('#\s*,\s*#', strtolower($m['tags']));
         $d = new self($tags);
+
         return $d;
     }
 

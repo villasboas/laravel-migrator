@@ -34,7 +34,7 @@ class ModelCommand extends Command
         } else {
             $this->shortName = $name;
             $this->namespace = $namespace;
-            $this->fullName = $namespace . $name;
+            $this->fullName = $namespace.$name;
         }
         $this->tableName = str_plural(snake_case($this->shortName));
     }
@@ -46,13 +46,14 @@ class ModelCommand extends Command
         $regex = "#^$nameRx$tableRx\$#";
 
         if (!preg_match($regex, $line, $m)) {
-            return null;
+            return;
         }
 
         $d = new self($m['name'], $namespace);
         if (isset($m['table'])) {
             $d->tableName = $m['table'];
         }
+
         return $d;
     }
 
@@ -63,7 +64,7 @@ class ModelCommand extends Command
 
     public function addMethod(MethodCommand $method)
     {
-        $this->methods [] = $method;
+        $this->methods[] = $method;
     }
 
     public function addImplicitFields()
@@ -102,8 +103,8 @@ class ModelCommand extends Command
     private function addImplicitFieldFromPolymorphic(MethodCommand $method)
     {
         if ($method->isPolymorphic()) {
-            $this->addImplicitField($method->getName() . '_id', 'integer');
-            $this->addImplicitField($method->getName() . '_type', 'string');
+            $this->addImplicitField($method->getName().'_id', 'integer');
+            $this->addImplicitField($method->getName().'_type', 'string');
         }
     }
 
@@ -122,9 +123,10 @@ class ModelCommand extends Command
         $names = [];
         foreach ($this->getFields() as $field) {
             if ($field->isPrimaryKey()) {
-                $names [] = $field->getName();
+                $names[] = $field->getName();
             }
         }
+
         return $names;
     }
 
@@ -171,13 +173,13 @@ class ModelCommand extends Command
         if ($prepend) {
             $this->fields = array_merge([$command], $this->fields);
         } else {
-            $this->fields [] = $command;
+            $this->fields[] = $command;
         }
     }
 
     public function addCommand(CommandCommand $command)
     {
-        $this->commands [] = $command;
+        $this->commands[] = $command;
     }
 
     public function is($name)
@@ -219,6 +221,7 @@ class ModelCommand extends Command
 
     /**
      * @param $modelShortName
+     *
      * @return MethodCommand[]
      */
     public function findMethodsByReturnType($modelShortName)
@@ -226,9 +229,10 @@ class ModelCommand extends Command
         $result = [];
         foreach ($this->methods as $method) {
             if ($method->canReturn($modelShortName)) {
-                $result [] = $method;
+                $result[] = $method;
             }
         }
+
         return $result;
     }
 
@@ -271,9 +275,10 @@ class ModelCommand extends Command
     }
 
     /**
-     * @return TableDefinition[]
      * @throws InverseMethodNotFound
      * @throws MultipleModelsWithSameShortName
+     *
+     * @return TableDefinition[]
      */
     public function getImplicitPivotTables()
     {
@@ -286,7 +291,7 @@ class ModelCommand extends Command
                     foreach ($method->getPivotTableDefinitionFields() as $field) {
                         $t->addField($field);
                     }
-                    $result [] = $t;
+                    $result[] = $t;
                 }
             } catch (InverseMethodNotFound $e) {
                 // definitely not many to many
@@ -314,6 +319,7 @@ class ModelCommand extends Command
 
     /**
      * @param $but
+     *
      * @return string
      */
     public function getPrimaryKeyFieldNamesExpectOne($but)
@@ -323,9 +329,11 @@ class ModelCommand extends Command
             throw new \RuntimeException("Model `{$this->getShortName()}` has no primary key, but $but");
         }
         if (count($pks) != 1) {
-            $join = join(',', $pks);
+            $join = implode(',', $pks);
+
             throw new \RuntimeException("Model `{$this->getShortName()}` has a complex primary key ($join), $but");
         }
+
         return $pks[0];
     }
 
@@ -346,11 +354,13 @@ class ModelCommand extends Command
                 }
             }
         }
+
         return false;
     }
 
     /**
      * @param $type string|string[]
+     *
      * @return FieldCommand[]
      */
     public function getFieldsWithType($type)
@@ -362,9 +372,10 @@ class ModelCommand extends Command
         $results = [];
         foreach ($this->fields as $field) {
             if (in_array($field->getFieldType(), $type)) {
-                $results [] = $field;
+                $results[] = $field;
             }
         }
+
         return $results;
     }
 
@@ -377,7 +388,7 @@ class ModelCommand extends Command
                     if (!isset($results[$indexName])) {
                         $results[$indexName] = [];
                     }
-                    $results[$indexName] [] = $field;
+                    $results[$indexName][] = $field;
                 }
             }
         }
@@ -393,15 +404,17 @@ class ModelCommand extends Command
                 if (!isset($results[$indexName])) {
                     $results[$indexName] = [];
                 }
-                $results[$indexName] [] = $field;
+                $results[$indexName][] = $field;
             }
         }
+
         return $results;
     }
 
     /**
      * @param $indexName
      * @param $field
+     *
      * @return bool
      */
     private function isThereRenameIndexCommandPreventingThisIndex($indexName, $field): bool
@@ -413,15 +426,15 @@ class ModelCommand extends Command
             }
             if ($command->isRenameIndex() && $command->getArg1() == $indexName) {
                 // we will rename $indexName to other name.. probably user forgot
-                throw new \RuntimeException("You have a `RENAME INDEX $indexName` command and you also try to " .
-                    "create Index($indexName) on a field `{$field->humanName()}`. You probably want to " .
+                throw new \RuntimeException("You have a `RENAME INDEX $indexName` command and you also try to ".
+                    "create Index($indexName) on a field `{$field->humanName()}`. You probably want to ".
                     "update the name of index to Index({$command->getArg2()})");
             }
             if ($command->isDeleteIndex() && $command->getArg1() == $indexName) {
                 // we will delete $indexName, so it's an error to try to create it
-                throw new \RuntimeException("You have a `DELETE INDEX $indexName` command and you also try to " .
-                    "create Index($indexName) on a field `{$field->humanName()}`. You probably want to " .
-                    "update delete that.");
+                throw new \RuntimeException("You have a `DELETE INDEX $indexName` command and you also try to ".
+                    "create Index($indexName) on a field `{$field->humanName()}`. You probably want to ".
+                    'update delete that.');
             }
         }
 
@@ -431,6 +444,7 @@ class ModelCommand extends Command
     /**
      * @param $indexName
      * @param $field
+     *
      * @return bool
      */
     private function isThereRenameFieldCommandPreventingThisField(FieldCommand $field): bool
@@ -441,8 +455,8 @@ class ModelCommand extends Command
                 return true;
             }
             if ($command->isRenameField() && $command->getArg1() == $field->getName()) {
-                throw new \RuntimeException("You have a `RENAME FIELD {$field->getName()}` command and you also try to " .
-                    "create the same field `{$field->getName()}` (in {$field->getModel()->getShortName()}). " .
+                throw new \RuntimeException("You have a `RENAME FIELD {$field->getName()}` command and you also try to ".
+                    "create the same field `{$field->getName()}` (in {$field->getModel()->getShortName()}). ".
                     "You probably want to change the field name to `{$command->getArg2()}`");
             }
         }
@@ -458,9 +472,10 @@ class ModelCommand extends Command
         $result = [];
         foreach ($this->getFields() as $field) {
             if ($field->isGuardedConsideringDefaults()) {
-                $result [] = $field;
+                $result[] = $field;
             }
         }
+
         return $result;
     }
 }

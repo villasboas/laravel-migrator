@@ -105,9 +105,9 @@ class MergeFileTest extends BaseTestCase
                 js2: json 
         ');
 
-        $this->assertContains('$casts', $this->getModelContents("User"));
-        $this->assertContains('js1', $this->getModelContents("User"));
-        $this->assertContains('js2', $this->getModelContents("User"));
+        $this->assertContains('$casts', $this->getModelContents('User'));
+        $this->assertContains('js1', $this->getModelContents('User'));
+        $this->assertContains('js2', $this->getModelContents('User'));
 
         $user = $this->newInstanceOf('User')->create(['js1' => [1], 'js2' => [2]]);
         $this->assertEquals([1], $this->newInstanceOf('User')->first()->js1);
@@ -132,7 +132,7 @@ class GeoRect extends Model
         file_put_contents($tmp, $file);
         $schema = new Schema();
         $model = ModelCommand::fromString('GeoRect', 'App');
-        $field = FieldCommand::fromString("history: json Guarded", $model);
+        $field = FieldCommand::fromString('history: json Guarded', $model);
         $field->setSchema($schema);
         $model->addField($field);
         (new MergeModelFiles($tmp, new ModelBuilder($tmp, 'GeoRect', $model)))->merge();
@@ -158,7 +158,7 @@ class GeoRect extends Model
         file_put_contents($tmp, $file);
         $schema = new Schema();
         $model = ModelCommand::fromString('GeoRect', 'App');
-        $field = FieldCommand::fromString("history: json", $model);
+        $field = FieldCommand::fromString('history: json', $model);
         $field->setSchema($schema);
         $model->addField($field);
         (new MergeModelFiles($tmp, new ModelBuilder($tmp, 'GeoRect', $model)))->merge();

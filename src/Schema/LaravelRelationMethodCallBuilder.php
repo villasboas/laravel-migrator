@@ -18,9 +18,10 @@ class LaravelRelationMethodCallBuilder
     }
 
     /**
-     * @return string
      * @throws InverseMethodNotFound
      * @throws MultipleModelsWithSameShortName
+     *
+     * @return string
      */
     public function build()
     {
@@ -65,18 +66,20 @@ class LaravelRelationMethodCallBuilder
         }
 
         $cls = get_class($this);
+
         throw new \InvalidArgumentException("Implement {$cls}::build() for {$this->method->relationType()}");
     }
 
     /**
-     * @return string
      * @throws InverseMethodNotFound
      * @throws MultipleModelsWithSameShortName
+     *
+     * @return string
      */
     private function forBelongsTo(): string
     {
         $invModel = $this->method->inverseMethod()->getModel();
-        $invClass = $invModel->getNamespace() . $invModel->getShortName();
+        $invClass = $invModel->getNamespace().$invModel->getShortName();
 
         $belongsField = '';
         $otherPrimaryField = '';
@@ -95,20 +98,21 @@ class LaravelRelationMethodCallBuilder
 
     /**
      * @param $typ
-     * @return string
+     *
      * @throws InverseMethodNotFound
      * @throws MultipleModelsWithSameShortName
+     *
+     * @return string
      */
     private function forHasOneOrMany($typ): string
     {
         $ourModel = $this->method->getModel();
         $invMethod = $this->method->inverseMethod();
         $invModel = $invMethod->getModel();
-        $invClass = $invModel->getNamespace() . $invModel->getShortName();
+        $invClass = $invModel->getNamespace().$invModel->getShortName();
 
         /** @see \Illuminate\Database\Eloquent\Concerns\HasRelationships::hasOne() */
         /** @see \Illuminate\Database\Eloquent\Concerns\HasRelationships::hasMany() */
-
         $foreignKey = '';
         $localKey = '';
         $e = "{$typ} {$this->method->humanName()} requires simple one-field primary key on {$ourModel->getShortName()}";
@@ -130,10 +134,9 @@ class LaravelRelationMethodCallBuilder
         $ourModel = $this->method->getModel();
         $invMethod = $this->method->inverseMethod();
         $invModel = $invMethod->getModel();
-        $invClass = $invModel->getNamespace() . $invModel->getShortName();
+        $invClass = $invModel->getNamespace().$invModel->getShortName();
 
         /** @see \Illuminate\Database\Eloquent\Concerns\HasRelationships::belongsToMany() */
-
         $pivotTableName = $this->method->getPivotTableName();
         $table = $this->commaQuotedArg($pivotTableName);
 
@@ -157,8 +160,8 @@ class LaravelRelationMethodCallBuilder
         $using = '';
         $withPivot = '';
         if ($pivotModel = $this->method->getSchema()->getModelByTableName($pivotTableName)) {
-            $using = '->using(' . $pivotModel->getNamespace() . $pivotModel->getShortName() . '::class)';
-            $withPivot = '->withPivot("' . join('", "', $pivotModel->getFieldsNames()) . '")';
+            $using = '->using('.$pivotModel->getNamespace().$pivotModel->getShortName().'::class)';
+            $withPivot = '->withPivot("'.implode('", "', $pivotModel->getFieldsNames()).'")';
         }
 
         $as = '';
@@ -169,18 +172,19 @@ class LaravelRelationMethodCallBuilder
 
         $withTimeStamps = '';
         if ($asName = $this->method->isPivotWithTimestamps()) {
-            $withTimeStamps = "->withTimestamps()";
+            $withTimeStamps = '->withTimestamps()';
         }
 
-        return $this->removeNulls("belongsToMany(" .
-            "$invClass::class{$table}{$foreignPivotKey}{$relatedPivotKey}{$parentKey}{$relatedKey}{$relation}" .
+        return $this->removeNulls('belongsToMany('.
+            "$invClass::class{$table}{$foreignPivotKey}{$relatedPivotKey}{$parentKey}{$relatedKey}{$relation}".
             "){$using}{$withPivot}{$as}{$withTimeStamps}");
     }
 
     /**
-     * @return null|string|string[]
      * @throws InverseMethodNotFound
      * @throws MultipleModelsWithSameShortName
+     *
+     * @return null|string|string[]
      */
     private function forHasManyThrough()
     {
@@ -192,13 +196,13 @@ class LaravelRelationMethodCallBuilder
 
         $throughMethod = $this->method->hasManyThroughIntermediateMethod(); // User.posts()
         $throughModel = $throughMethod->getModel();
-        $throughClass = $throughModel->getNamespace() . $throughModel->getShortName(); // User
+        $throughClass = $throughModel->getNamespace().$throughModel->getShortName(); // User
 
         $endModel = $throughMethod->inverseMethod()->getModel();
-        $endClass = $endModel->getNamespace() . $endModel->getShortName(); // Post
+        $endClass = $endModel->getNamespace().$endModel->getShortName(); // Post
 
-        $relatedCls = $endClass . '::class'; // Post
-        $throughCls = ', ' . $throughClass . '::class'; // User
+        $relatedCls = $endClass.'::class'; // Post
+        $throughCls = ', '.$throughClass.'::class'; // User
 
         // 'country_id', // Foreign key on users table...
         $firstKey = $this->commaQuotedArg($invMethod->belongsToFieldName());
@@ -213,13 +217,14 @@ class LaravelRelationMethodCallBuilder
         // 'id' // Local key on users table...
         $secondLocalKey = $this->commaQuotedArg($throughModel->getPrimaryKeyFieldNamesExpectOne($but), 'id');
 
-        return $this->removeNulls("hasManyThrough(" .
-            "{$relatedCls}{$throughCls}{$firstKey}{$secondKey}{$localKey}{$secondLocalKey}" .
-            ")");
+        return $this->removeNulls('hasManyThrough('.
+            "{$relatedCls}{$throughCls}{$firstKey}{$secondKey}{$localKey}{$secondLocalKey}".
+            ')');
     }
 
     /**
      * @param $value
+     *
      * @return string
      */
     private function commaQuotedArg($value, $nullIfEqualsThis = null): string
@@ -228,6 +233,7 @@ class LaravelRelationMethodCallBuilder
             return ', null';
         }
         $e = addslashes($value);
+
         return ", '$e'";
     }
 
@@ -237,6 +243,7 @@ class LaravelRelationMethodCallBuilder
         while (preg_match($rx, $string)) {
             $string = preg_replace($rx, ')', $string);
         }
+
         return $string;
     }
 
@@ -250,12 +257,11 @@ class LaravelRelationMethodCallBuilder
         $ourModel = $this->method->getModel(); // Post
         $invMethod = $this->method->inverseMethod(); // Comment.commentable()
         $invModel = $invMethod->getModel(); // Comment
-        $invClass = $invModel->getNamespace() . $invModel->getShortName(); // Comment
+        $invClass = $invModel->getNamespace().$invModel->getShortName(); // Comment
 
         /** @see Following example at https://laravel.com/docs/5.6/eloquent-relationships#polymorphic-relations */
         /** @see \Illuminate\Database\Eloquent\Concerns\HasRelationships::morphMany() */
-
-        $related = $invClass . '::class';
+        $related = $invClass.'::class';
         $ableName = $invMethod->getName();
         $name = $this->commaQuotedArg($ableName); // commentable
         $type = $this->commaQuotedArg("{$ableName}_type");
@@ -274,8 +280,8 @@ class LaravelRelationMethodCallBuilder
         // we are folling example for Post.tags()
 
         $endModel = $this->method->getSchema()->getModel($this->method->getReturnTypeSingle()); // Tag
-        $endClass = $endModel->getNamespace() . $endModel->getShortName(); // \..\Tag
-        $related = $endClass . '::class';
+        $endClass = $endModel->getNamespace().$endModel->getShortName(); // \..\Tag
+        $related = $endClass.'::class';
 
         $name = $this->commaQuotedArg($this->method->inverseMethod()->getName());
         $table = $this->commaQuotedArg($this->method->inverseMethod()->getModel()->getTableName());
@@ -295,8 +301,8 @@ class LaravelRelationMethodCallBuilder
         // we are folling example for Tag.posts()
 
         $endModel = $this->method->getSchema()->getModel($this->method->getReturnTypeSingle()); // Tag
-        $endClass = $endModel->getNamespace() . $endModel->getShortName(); // \..\Tag
-        $related = $endClass . '::class';
+        $endClass = $endModel->getNamespace().$endModel->getShortName(); // \..\Tag
+        $related = $endClass.'::class';
 
         $invModel = $this->method->inverseMethod()->getModel();
         $invPolymorphicMethodName = $invModel->findMethodsByReturnType($this->method->getReturnTypeSingle())[0]->getName();
@@ -308,7 +314,6 @@ class LaravelRelationMethodCallBuilder
         $relatedPivotKey = $this->commaQuotedArg(null);
         $parentKey = $this->commaQuotedArg(null);
         $relatedKey = $this->commaQuotedArg(null);
-
 
         if (['id'] != $this->method->inverseMethod()->getModel()->getPrimaryKeyFieldNames()) {
             throw new \RuntimeException("Currently, we don't support polymorphic many-to-many with custom Primary Key see LaravelRelationMethodCallBuilder method `forMorphedByMany()` for explanation");

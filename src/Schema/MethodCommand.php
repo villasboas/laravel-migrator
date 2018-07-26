@@ -52,12 +52,12 @@ class MethodCommand extends Command
         $viaNameRx = "(?P<via>[a-zA-Z0-9_\.\(\)]+)";
         $viaRx = "(\s*via\s*$viaNameRx)?";
         $nameRx = "((?P<name>[A-Za-z0-9_]+)\(\)$viaRx)";
-        $tagsRx = "(?P<tags>(.*))";
+        $tagsRx = '(?P<tags>(.*))';
 
         $regex = "#^{$nameRx}(:\s+$returnTypeRx(\s+$tagsRx)?)?\s*$#";
 
         if (!preg_match($regex, $line, $m)) {
-            return null;
+            return;
         }
 
         $d = new self($m['name']);
@@ -66,7 +66,6 @@ class MethodCommand extends Command
         $d->setReturnType(array_get($m, 'return_type'));
 
         $d->parseTags(array_get($m, 'tags'));
-
 
         return $d;
     }
@@ -87,7 +86,7 @@ class MethodCommand extends Command
         $notNullRx = '/^NotNull$/';
         $nullRx = '/^(Null|Nullable)$/';
 
-        $pivotWithTimestampsRx = "/^PivotWithTimestamps\$/i";
+        $pivotWithTimestampsRx = '/^PivotWithTimestamps$/i';
 
         $tags = preg_split('#,\s*#', $tagString); // TODO: probably too naive
         foreach ($tags as $tag) {
@@ -97,7 +96,7 @@ class MethodCommand extends Command
             } elseif (preg_match($inverseOfRx, $tag, $m1)) {
                 $this->setInverseOf(array_get($m1, 'inverse_of'));
             } elseif (preg_match($asRx, $tag, $m1)) {
-                $this->setAs(array_get($m1, 'as1', '') . array_get($m1, 'as2', ''));
+                $this->setAs(array_get($m1, 'as1', '').array_get($m1, 'as2', ''));
             } elseif (preg_match($pivotWithTimestampsRx, $tag, $m1)) {
                 $this->pivotWithTimestamps = true;
             } elseif (preg_match($notNullRx, $tag, $m1)) {
@@ -121,16 +120,16 @@ class MethodCommand extends Command
 
         $name = '[A-Za-z0-9_]+';
 
-        $condition1 = "(?P<cond1_l_table>$name)\\.(?P<cond1_l_field>$name)\\s*=" .
+        $condition1 = "(?P<cond1_l_table>$name)\\.(?P<cond1_l_field>$name)\\s*=".
             "\\s*(?P<cond1_r_table>$name)\\.(?P<cond1_r_field>$name)";
 
-        $condition2 = "(?P<cond2_l_table>$name)\\.(?P<cond2_l_field>$name)\\s*=" .
+        $condition2 = "(?P<cond2_l_table>$name)\\.(?P<cond2_l_field>$name)\\s*=".
             "\\s*(?P<cond2_r_table>$name)\\.(?P<cond2_r_field>$name)";
 
         $joinRegex = "/^\\s*$condition1((\\s+AND\\s+$condition2)\\s*)?\$/";
 
         if (!preg_match($joinRegex, $this->getJoinString(), $match)) {
-            throw new \RuntimeException("Cannot parse join: " . $this->getJoinString());
+            throw new \RuntimeException('Cannot parse join: '.$this->getJoinString());
         }
 
         $results = array_except($match, range(0, 20)); // remove non-named matches
@@ -145,9 +144,9 @@ class MethodCommand extends Command
             $number = array_values(array_count_values($tables));
             sort($number);
             if ($number != [1, 1, 2]) {
-                throw new \RuntimeException("Joins with \"AND\" are currently used only for many-to-many relations " .
-                    "and so should reference the same table twice, like this: " .
-                    "\"table1.X = table2.Y AND table2.Z = table3.A\" " .
+                throw new \RuntimeException('Joins with "AND" are currently used only for many-to-many relations '.
+                    'and so should reference the same table twice, like this: '.
+                    '"table1.X = table2.Y AND table2.Z = table3.A" '.
                     "see: \"{$this->getJoinString()}\"");
             }
         }
@@ -193,6 +192,7 @@ class MethodCommand extends Command
         } catch (\Exception $e) {
             // it's ok, we tried..
         }
+
         return $this->joinString;
     }
 
@@ -214,6 +214,7 @@ class MethodCommand extends Command
         if (!$this->returnsOne()) {
             return false;
         }
+
         return $this->relationType() == self::BELONGS_TO;
     }
 
@@ -263,7 +264,6 @@ class MethodCommand extends Command
         if ($this->returnsMany()) {
             $inverseMethod = $this->inverseMethod();
 
-
             if ($inverseMethod->returnsOne()) {
                 if ($this->getVia() && $viaModel = $this->getSchema()->getModel($this->getVia())) {
                     // morphToMany is like Post.tags() via Taggable
@@ -285,6 +285,7 @@ class MethodCommand extends Command
                 if ($inverseMethod->isPolymorphic()) {
                     return self::POLYMORPHIC_MORPH_MANY;
                 }
+
                 return self::HAS_MANY;
             }
 
@@ -316,8 +317,9 @@ class MethodCommand extends Command
     }
 
     /**
-     * @return string
      * @throws MultipleModelsWithSameShortName
+     *
+     * @return string
      */
     public function belongsToFieldName(): string
     {
@@ -333,12 +335,12 @@ class MethodCommand extends Command
             // skip, if there is not other method - then we can do nothing here
         }
 
-        return str_singular($this->name) . "_id";
+        return str_singular($this->name).'_id';
     }
 
     public function isBelongsFieldDefault()
     {
-        return $this->belongsToFieldName() === $this->name . "_id";
+        return $this->belongsToFieldName() === $this->name.'_id';
     }
 
     private function viaOrJoinCreatesField()
@@ -347,16 +349,16 @@ class MethodCommand extends Command
     }
 
     /**
-     * @return null|MethodCommand
      * @throws InverseMethodNotFound
      * @throws MultipleModelsWithSameShortName
+     *
+     * @return null|MethodCommand
      */
     public function inverseMethod()
     {
         $otherModel = $this->guessInverseModelName();
         $otherMethodSingular = str_singular(snake_case($this->modelShortName()));
         $otherMethodPlural = str_plural(snake_case($this->modelShortName()));
-
 
         if ($this->getInverseOf()) {
             return $this->getInverseOfMethod();
@@ -369,8 +371,9 @@ class MethodCommand extends Command
 //        }
 
         if ($model) {
-            $hint = "we tried to look for methods `{$model->getShortName()}.{$otherMethodSingular}()` and " .
+            $hint = "we tried to look for methods `{$model->getShortName()}.{$otherMethodSingular}()` and ".
                 "`{$model->getShortName()}.{$otherMethodPlural}()`, but neither was there.";
+
             try {
                 return $model->getMethod($otherMethodPlural);
             } catch (\Exception $e) {
@@ -400,19 +403,20 @@ class MethodCommand extends Command
         $otherMethod = str_plural(snake_case($this->modelShortName()));
         $otherModel = studly_case($this->name);
 
-        $message = "Method `{$this->humanName()}` returns only one thing, so it is probably of type " .
-            "`Belongs To`, which requires field `$field`, but I'm not sure if I should create it " .
-            "(fix: define method `$otherModel.$otherMethod()` " .
-            "or define field in model `{$this->modelShortName()}` as `$this->name() via $field` " .
+        $message = "Method `{$this->humanName()}` returns only one thing, so it is probably of type ".
+            "`Belongs To`, which requires field `$field`, but I'm not sure if I should create it ".
+            "(fix: define method `$otherModel.$otherMethod()` ".
+            "or define field in model `{$this->modelShortName()}` as `$this->name() via $field` ".
             "or as `$field: integer` field)";
 
         throw new \RuntimeException($message);
     }
 
     /**
-     * @return null
      * @throws InverseMethodNotFound
      * @throws MultipleModelsWithSameShortName
+     *
+     * @return null
      */
     private function inverseMethodCreatesFieldInOurTable()
     {
@@ -434,10 +438,11 @@ class MethodCommand extends Command
         $That = $this->inverseMethod()->getModel()->getShortName();
         $thisLower = strtolower($That);
         $thatLower = strtolower($This);
-        $message = "Model $This contains a confusing One to One definition between `$This.$thisLower()` and `$That.$thatLower()`. " .
-            "One to one requires a field in one of these tables. " .
-            "To resolve it: if $This (usually) belongs to $That - then add `$thisLower() via {$thisLower}_id` to $This; " .
+        $message = "Model $This contains a confusing One to One definition between `$This.$thisLower()` and `$That.$thatLower()`. ".
+            'One to one requires a field in one of these tables. '.
+            "To resolve it: if $This (usually) belongs to $That - then add `$thisLower() via {$thisLower}_id` to $This; ".
             "otherwise if $That (usually) belongs to $This - then add `{$thatLower}() via {$thatLower}_id` to $That.";
+
         throw new \RuntimeException($message);
     }
 
@@ -474,7 +479,7 @@ class MethodCommand extends Command
     {
         if (!$this->returnType) {
             if ($this->name == str_plural($this->name)) {
-                return studly_case(str_singular($this->name)) . '[]';
+                return studly_case(str_singular($this->name)).'[]';
             } else {
                 return studly_case($this->name);
             }
@@ -489,7 +494,6 @@ class MethodCommand extends Command
         if (in_array($name, $types)) {
             return $name;
         }
-        return null;
     }
 
     /**
@@ -502,7 +506,7 @@ class MethodCommand extends Command
         if ($this->isReturnTypePolymorphic() && $this->returnsMany()) {
             $this->returnType = $old;
 
-            $did = ".";
+            $did = '.';
             if (ends_with($returnType, '[]')) {
                 $without = preg_replace('#\[\]$#', '', $returnType);
                 $did = ", did you mean just `$without` instead of `{$returnType}`?";
@@ -521,6 +525,7 @@ class MethodCommand extends Command
         if ($this->getSchema()->getModel($this->via)) {
             return false;
         }
+
         return !ends_with($this->via, '()');
     }
 
@@ -566,12 +571,14 @@ class MethodCommand extends Command
     }
 
     /**
-     * @return MethodCommand
      * @throws MultipleModelsWithSameShortName
+     *
+     * @return MethodCommand
      */
-    private function getInverseOfMethod(): MethodCommand
+    private function getInverseOfMethod(): self
     {
         $model = $this->getSchema()->getModel($this->getInverseOfModelName());
+
         return $model->getMethod($this->getInverseOfMethodName());
     }
 
@@ -580,7 +587,7 @@ class MethodCommand extends Command
         $model = $this->getSchema()->getModel($this->guessInverseModelName());
 
         if (!$model) {
-            return null;
+            return;
         }
 
         if ($methods = $model->findMethodsByReturnType($this->modelShortName())) {
@@ -589,26 +596,25 @@ class MethodCommand extends Command
             }
         }
 
-        if ($methods = $model->findMethodsByReturnType($this->modelShortName() . '[]')) {
+        if ($methods = $model->findMethodsByReturnType($this->modelShortName().'[]')) {
             if (count($methods) == 1) {
                 return $methods[0];
             }
         }
-
-        return null;
     }
 
     public function humanName()
     {
         $model = $this->modelShortName();
         $name = $this->name;
+
         return "$model.$name()";
     }
 
     public function fieldThatJoinCreatesIn($modelShortName)
     {
         if (empty($this->getJoinString())) {
-            return null;
+            return;
         }
 
         $p = $this->parseJoin();
@@ -619,8 +625,6 @@ class MethodCommand extends Command
         if ($p['cond1_r_table'] == $modelShortName && $p['cond1_r_field'] !== 'id') {
             return $p['cond1_r_field'];
         }
-
-        return null;
     }
 
     public function findOwnFieldInJoinExceptPrimaryKey()
@@ -629,14 +633,13 @@ class MethodCommand extends Command
         if ($field && !in_array($field, $this->getModel()->getPrimaryKeyFieldNames())) {
             return $field;
         }
-        return null;
     }
 
     public function findOwnFieldInJoin()
     {
         $p = $this->parseJoin();
         if (empty($p)) {
-            return null;
+            return;
         }
 
         if ($p['cond1_l_table'] == $this->getModel()->getShortName()) {
@@ -645,19 +648,19 @@ class MethodCommand extends Command
         if ($p['cond1_r_table'] == $this->getModel()->getShortName()) {
             return $p['cond1_r_field'];
         }
-
-        return null;
     }
 
     private function getInverseOfModelName()
     {
         $p = $this->parseInverseOfIntoParts();
+
         return $p[0];
     }
 
     private function getInverseOfMethodName()
     {
         $p = $this->parseInverseOfIntoParts();
+
         return $p[1];
     }
 
@@ -669,10 +672,11 @@ class MethodCommand extends Command
     private function parseInverseOfIntoParts(): array
     {
         $l = preg_replace('/\(\)/', '', $this->getInverseOf());
-        $p = explode(".", $l);
+        $p = explode('.', $l);
         if (count($p) != 2) {
-            throw new \RuntimeException("Inverse of (<-) should be in format `Model.method()`");
+            throw new \RuntimeException('Inverse of (<-) should be in format `Model.method()`');
         }
+
         return $p;
     }
 
@@ -692,8 +696,9 @@ class MethodCommand extends Command
     }
 
     /**
-     * @return MethodCommand
      * @throws MultipleModelsWithSameShortName
+     *
+     * @return MethodCommand
      */
     public function hasManyThroughIntermediateMethod()
     {
@@ -733,9 +738,10 @@ class MethodCommand extends Command
      * Returns true if this is the "first" (alphabetically) of two tables, like in "users" and "roles",
      * "roles" would be first.
      *
-     * @return bool
      * @throws InverseMethodNotFound
      * @throws MultipleModelsWithSameShortName
+     *
+     * @return bool
      */
     public function isManyToManyFirst()
     {
@@ -758,7 +764,7 @@ class MethodCommand extends Command
         }
 
         if ($returnNullIfDefault) {
-            return null;
+            return;
         }
 
         $table1 = str_singular($this->getModel()->getTableName());
@@ -775,6 +781,7 @@ class MethodCommand extends Command
         if ($model = $this->getSchema()->getModel($table)) {
             return $model->getTableName();
         }
+
         return $table;
     }
 
@@ -796,9 +803,10 @@ class MethodCommand extends Command
     }
 
     /**
-     * @return string
      * @throws InverseMethodNotFound
      * @throws MultipleModelsWithSameShortName
+     *
+     * @return string
      */
     public function laravelRelationCall()
     {
@@ -806,12 +814,14 @@ class MethodCommand extends Command
     }
 
     /**
-     * @return bool
      * @throws MultipleModelsWithSameShortName
+     *
+     * @return bool
      */
     private function belongsToFieldExists()
     {
         $bf = $this->belongsToFieldName();
+
         return $this->getModel()->hasField($bf);
     }
 
@@ -822,10 +832,10 @@ class MethodCommand extends Command
         }
 
         if ($nullIfDefault) {
-            return null;
+            return;
         }
 
-        return str_singular($this->name) . '_id';
+        return str_singular($this->name).'_id';
     }
 
     public function getPivotTableDefinitionFields()
@@ -848,6 +858,7 @@ class MethodCommand extends Command
             self::$defaultPivotFieldType,
             $nullable
         );
+
         return $field;
     }
 
@@ -858,36 +869,38 @@ class MethodCommand extends Command
         if (count($p) == 0) {
             throw new \RuntimeException("Trying to parse '{$this->getJoinString()}' I needed to find part that matches table or model $modelOrTable, but couldn't");
         }
+
         return $p[0]['field2'];
     }
 
     private function parseJoinToPairs()
     {
         $p = $this->parseJoin();
+
         return [
             [
                 'table1' => $p['cond1_l_table'],
                 'field1' => $p['cond1_l_field'],
                 'table2' => $p['cond1_r_table'],
-                'field2' => $p['cond1_r_field']
+                'field2' => $p['cond1_r_field'],
             ],
             [
                 'table1' => $p['cond1_r_table'],
                 'field1' => $p['cond1_r_field'],
                 'table2' => $p['cond1_l_table'],
-                'field2' => $p['cond1_l_field']
+                'field2' => $p['cond1_l_field'],
             ],
             [
                 'table1' => $p['cond2_l_table'],
                 'field1' => $p['cond2_l_field'],
                 'table2' => $p['cond2_r_table'],
-                'field2' => $p['cond2_r_field']
+                'field2' => $p['cond2_r_field'],
             ],
             [
                 'table1' => $p['cond2_r_table'],
                 'field1' => $p['cond2_r_field'],
                 'table2' => $p['cond2_l_table'],
-                'field2' => $p['cond2_l_field']
+                'field2' => $p['cond2_l_field'],
             ],
         ];
     }
@@ -896,12 +909,13 @@ class MethodCommand extends Command
     {
         $arr = [$modelOrTable];
         if ($model = $this->getSchema()->getModel($modelOrTable)) {
-            $arr [] = $model->getTableName();
+            $arr[] = $model->getTableName();
         }
         if ($model = $this->getSchema()->getModelByTableName($modelOrTable)) {
-            $arr [] = $model->getShortName();
+            $arr[] = $model->getShortName();
         }
         $p = collect($this->parseJoinToPairs());
+
         return $p->whereIn('table1', $arr)->values()->all();
     }
 

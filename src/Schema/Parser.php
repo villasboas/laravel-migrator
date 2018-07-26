@@ -5,13 +5,13 @@ namespace Migrator\Schema;
 use Migrator\Schema\Exceptions\ParseFailure;
 
 /**
- * Class Parser
- * @package Migrator\Schema
+ * Class Parser.
+ *
  * @see
  */
 class Parser
 {
-    private $currentNameSpace = "\\App\\";
+    private $currentNameSpace = '\\App\\';
     private $bufferForComma = '';
     private $baseIndent = null;
 
@@ -20,6 +20,7 @@ class Parser
 
     /**
      * @param $text
+     *
      * @return Schema
      */
     public function parse($text)
@@ -36,7 +37,8 @@ class Parser
 
             if ($result instanceof ParseFailure) {
                 $i++;
-                throw new \RuntimeException("Cannot parse: line $i: " . trim($line));
+
+                throw new \RuntimeException("Cannot parse: line $i: ".trim($line));
             }
 
             if ($result instanceof Command) {
@@ -49,7 +51,7 @@ class Parser
             }
 
             if ($result->getCommandType() == 'Namespace') {
-                /** @var NamespaceCommand $result */
+                /* @var NamespaceCommand $result */
                 $this->currentNameSpace = $result->getNamespace();
                 $schema->addNamespace($result);
             }
@@ -63,17 +65,17 @@ class Parser
             }
 
             if ($result->getCommandType() == 'Field') {
-                /** @var FieldCommand $result */
+                /* @var FieldCommand $result */
                 $this->currentModel->addField($result);
             }
 
             if ($result->getCommandType() == 'Method') {
-                /** @var MethodCommand $result */
+                /* @var MethodCommand $result */
                 $this->currentModel->addMethod($result);
             }
 
             if ($result->getCommandType() == 'Command') {
-                /** @var CommandCommand $result */
+                /* @var CommandCommand $result */
                 $this->currentModel->addCommand($result);
             }
         }
@@ -92,12 +94,13 @@ class Parser
 
     /**
      * @param $line
+     *
      * @return null|ParseFailure|Command
      */
     private function parseLine($line)
     {
         if ($this->isEmptyLine($line) || $this->isCommentLine($line)) {
-            return null;
+            return;
         }
 
         $indent = $this->getIndent($line);
@@ -141,6 +144,7 @@ class Parser
     private function parseAtBaseIndent($line)
     {
         $line = trim($line);
+
         return $this->parseDefault($line) ?: $this->parseNameSpace($line) ?: $this->parseModel($line) ?:
             new ParseFailure($line);
     }
@@ -151,7 +155,7 @@ class Parser
         $this->bufferForComma .= $line;
 
         if ($this->endsWithComma($line)) {
-            return null;
+            return;
         }
 
         $line = $this->bufferForComma;
@@ -193,6 +197,7 @@ class Parser
 
     /**
      * @param $line
+     *
      * @return FieldCommand
      */
     public function parseField($line)
@@ -202,6 +207,7 @@ class Parser
 
     /**
      * @param $line
+     *
      * @return MethodCommand
      */
     public function parseMethod($line)
@@ -211,6 +217,7 @@ class Parser
 
     /**
      * @param $line
+     *
      * @return CommandCommand
      */
     public function parseCommand($line)

@@ -30,21 +30,24 @@ class Schema
 
     public function addModel($result)
     {
-        $this->models [] = $result;
+        $this->models[] = $result;
+
         return $result;
     }
 
     /**
      * @param $name
-     * @return ModelCommand
+     *
      * @throws MultipleModelsWithSameShortName
+     *
+     * @return ModelCommand
      */
     public function getModel($name)
     {
         $results = [];
         foreach ($this->models as $model) {
             if ($model->is($name)) {
-                $results [] = $model;
+                $results[] = $model;
             }
         }
 
@@ -53,7 +56,7 @@ class Schema
         }
 
         if (count($results) == 0) {
-            return null;
+            return;
         }
 
         throw new MultipleModelsWithSameShortName("Multiple models match $name, use fully qualified name");
@@ -65,10 +68,10 @@ class Schema
         $tables = [];
         foreach ($this->models as $model) {
             foreach ($model->getTables() as $table) {
-                $tables [] = $table->getName();
+                $tables[] = $table->getName();
             }
             foreach ($model->getImplicitPivotTables() as $table) {
-                $tables [] = $table->getName();
+                $tables[] = $table->getName();
             }
         }
 
@@ -87,7 +90,7 @@ class Schema
                 if ($method->isManyToMany()) {
                     $pivotTableOrModelName = $method->getPivotTableName();
                     if (!$this->getModel($pivotTableOrModelName)) {
-                        $tables [] = $pivotTableOrModelName;
+                        $tables[] = $pivotTableOrModelName;
                     }
                 }
             }
@@ -134,6 +137,7 @@ class Schema
 
     /**
      * @param $table
+     *
      * @return ModelCommand
      */
     public function getModelByTableName($table)

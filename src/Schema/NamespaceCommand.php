@@ -15,13 +15,14 @@ class NamespaceCommand extends Command
 
     /**
      * @param $namespace
+     *
      * @return string
      */
     public static function normalize($namespace): string
     {
         $namespace = trim($namespace, '\\');
 
-        return "\\" . $namespace . "\\";
+        return '\\'.$namespace.'\\';
     }
 
     public static function fromString($line)
@@ -29,7 +30,7 @@ class NamespaceCommand extends Command
         $regex = '#^namespace\s+(?P<namespace>\S*)(\s+(?P<path>\S*)\s*)?$#';
 
         if (!preg_match($regex, $line, $m)) {
-            return null;
+            return;
         }
 
         $ns = self::normalize($m['namespace']);
@@ -39,7 +40,7 @@ class NamespaceCommand extends Command
                 $m['path'] = 'app/';
             }
             if (starts_with($ns, '\\App\\')) {
-                $path = preg_replace("/^\\\\App\\\\/", 'app\\', $ns);
+                $path = preg_replace('/^\\\\App\\\\/', 'app\\', $ns);
                 $m['path'] = str_replace('\\', '/', $path);
             } else {
                 throw new \RuntimeException("Cannot infer what path should be for namespace {$m['namespace']}, use form `namespace {$m['namespace']} app/Path/Path`");
@@ -47,6 +48,7 @@ class NamespaceCommand extends Command
         }
 
         $d = new self($m['namespace'], $m['path']);
+
         return $d;
     }
 
@@ -54,6 +56,7 @@ class NamespaceCommand extends Command
     {
         $path = trim($path, DIRECTORY_SEPARATOR);
         $path .= DIRECTORY_SEPARATOR;
+
         return $path;
     }
 

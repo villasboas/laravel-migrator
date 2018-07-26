@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Migrator\Tests;
 
 use DB;
@@ -22,10 +21,10 @@ trait GenerateAndRun
         self::$namespaceNumber++;
         $this->cleanupMigrationFiles();
         $this->migrator = new Migrator();
-        $this->migrator->appPath = dirname(__DIR__) . '/';
+        $this->migrator->appPath = dirname(__DIR__).'/';
 
         $f = new Filesystem();
-        $f->deleteDirectory($this->migrator->appPath . 'app/Models');
+        $f->deleteDirectory($this->migrator->appPath.'app/Models');
 
         DB::beginTransaction();
     }
@@ -34,7 +33,7 @@ trait GenerateAndRun
     {
         foreach (glob(database_path('migrations/*')) as $file) {
             unlink($file);
-        };
+        }
     }
 
     protected function tearDown()
@@ -45,22 +44,24 @@ trait GenerateAndRun
             unlink($file);
         }
         $f = new Filesystem();
-        $f->deleteDirectory($this->migrator->appPath . 'app/Models');
+        $f->deleteDirectory($this->migrator->appPath.'app/Models');
         parent::tearDown();
     }
 
     private function generateButDontRun($string)
     {
         $this->migrator = new Migrator();
-        $this->migrator->appPath = dirname(__DIR__) . '/';
+        $this->migrator->appPath = dirname(__DIR__).'/';
         if ($this->overwriteModels) {
             $this->migrator->overwriteModels();
         }
         $string = $this->replaceNamespace($string);
+
         try {
             $this->migrator->migrate($string, true, false);
         } catch (\ParseError $e) {
             $this->dump();
+
             throw $e;
         }
 
@@ -69,14 +70,16 @@ trait GenerateAndRun
 
     /**
      * @param $string
+     *
      * @return mixed
      */
     private function replaceNamespace($string)
     {
         if (str_contains($string, '{namespace}')) {
-            $this->ns = "App\Models\TestNs" . (self::$namespaceNumber);
+            $this->ns = "App\Models\TestNs".(self::$namespaceNumber);
             $string = str_replace('{namespace}', $this->ns, $string);
         }
+
         return $string;
     }
 
@@ -89,39 +92,41 @@ trait GenerateAndRun
     private function dumpMigrations($filter = null)
     {
         if (empty($this->migrator->migrationsCreated)) {
-            print("[!!] No migrations were created!\n\n");
+            echo "[!!] No migrations were created!\n\n";
         }
         foreach ($this->migrator->migrationsCreated as $file => $contents) {
             if ($filter === null || str_contains(strtolower($file), strtolower($filter))) {
-                print("-------\n$file\n-------\n$contents\n-------\n\n");
+                echo "-------\n$file\n-------\n$contents\n-------\n\n";
             }
-        };
+        }
     }
 
     private function dumpModels($filterNames = null)
     {
         if (empty($this->migrator->modelsCreated)) {
-            print("[!!] No models were created!\n\n");
+            echo "[!!] No models were created!\n\n";
         }
         foreach ($this->migrator->modelsCreated as $file => $contents) {
             if ($filterNames === null || str_contains(strtolower($file), strtolower($filterNames))) {
-                print("-------\n$file\n-------\n$contents\n-------\n\n");
+                echo "-------\n$file\n-------\n$contents\n-------\n\n";
             }
-        };
+        }
     }
 
     private function generateAndRun($string)
     {
         $this->migrator = new Migrator();
-        $this->migrator->appPath = dirname(__DIR__) . '/';
+        $this->migrator->appPath = dirname(__DIR__).'/';
         if ($this->overwriteModels) {
             $this->migrator->overwriteModels();
         }
         $string = $this->replaceNamespace($string);
+
         try {
             $this->migrator->migrate($string);
         } catch (\ParseError $e) {
             $this->dump();
+
             throw $e;
         }
 
@@ -130,12 +135,14 @@ trait GenerateAndRun
 
     /**
      * @param $className
+     *
      * @return mixed|\Illuminate\Database\Eloquent\Model
      */
     private function newInstanceOf($className)
     {
         $cls = "{$this->ns}\\$className";
-        return new $cls;
+
+        return new $cls();
     }
 
     private function runGenerated(): void
@@ -164,6 +171,7 @@ trait GenerateAndRun
 
     /**
      * @param $model
+     *
      * @return bool|string
      */
     private function getModelContents($model)
@@ -173,15 +181,16 @@ trait GenerateAndRun
 
     /**
      * @param string $filename
+     *
      * @return string
      */
     private function currentModelDir($filename = ''): string
     {
-        return dirname(__DIR__) . DIRECTORY_SEPARATOR . lcfirst(str_replace(
+        return dirname(__DIR__).DIRECTORY_SEPARATOR.lcfirst(str_replace(
                 '\\',
                 '/',
                 $this->ns
-            )) . DIRECTORY_SEPARATOR . $filename;
+            )).DIRECTORY_SEPARATOR.$filename;
     }
 
     private function assertFieldExists($table, $field): void
@@ -211,7 +220,7 @@ trait GenerateAndRun
 
     private function assertFileExistsInApp($file)
     {
-        return $this->assertTrue(file_exists(__DIR__ . '/../app/' . $file));
+        return $this->assertTrue(file_exists(__DIR__.'/../app/'.$file));
     }
 
     private function assertMigrationsNotContain($what, $filterNames = null)
@@ -223,10 +232,11 @@ trait GenerateAndRun
                 if (str_contains($contents, $what)) {
                     $this->dumpMigrations($filterNames);
                     $this->fail("Migrations (filter: '$filterNames') do contain: '$what' (but should not)");
+
                     return;
                 }
             }
-        };
+        }
 
         if (!$found) {
             $this->fail("None of migrations pass the filter '$filterNames' (none generated?)");
@@ -243,10 +253,11 @@ trait GenerateAndRun
                 $found = true;
                 if (str_contains($contents, $what)) {
                     $this->assertTrue(true);
+
                     return;
                 }
             }
-        };
+        }
 
         if (!$found) {
             $this->fail("None of models pass the filter '$filterNames' (none generated?)'");
@@ -265,10 +276,11 @@ trait GenerateAndRun
                 $found = true;
                 if (str_contains($contents, $what)) {
                     $this->assertTrue(true);
+
                     return;
                 }
             }
-        };
+        }
 
         if (!$found) {
             $this->fail("None of models pass the filter $filterNames");

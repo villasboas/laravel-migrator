@@ -132,7 +132,7 @@ class ParserTest extends BaseTestCase
     /** @test */
     public function parse_at_zero_indent()
     {
-        $this->parse("Item\n" . "  title: string\n");
+        $this->parse("Item\n"."  title: string\n");
         $this->assertTrue(true); // no exception happened
     }
 
@@ -304,7 +304,6 @@ class ParserTest extends BaseTestCase
         $this->parse('Users');
     }
 
-
     /** @test */
     public function spec_1()
     {
@@ -342,9 +341,9 @@ class ParserTest extends BaseTestCase
     /** @test */
     public function which_has_one()
     {
-        $message = 'Model User contains a confusing One to One definition between `User.phone()` and `Phone.user()`. ' .
-            'One to one requires a field in one of these tables. To resolve it: ' .
-            'if User (usually) belongs to Phone - then add `phone() via phone_id` to User; ' .
+        $message = 'Model User contains a confusing One to One definition between `User.phone()` and `Phone.user()`. '.
+            'One to one requires a field in one of these tables. To resolve it: '.
+            'if User (usually) belongs to Phone - then add `phone() via phone_id` to User; '.
             'otherwise if Phone (usually) belongs to User - then add `user() via user_id` to Phone.';
         $this->expectExceptionMessage($message);
 
@@ -555,7 +554,6 @@ class ParserTest extends BaseTestCase
         $this->assertEquals(MethodCommand::BELONGS_TO, $phoneMethod->relationType());
     }
 
-
     /** @test */
     public function spec_4()
     {
@@ -686,7 +684,7 @@ class ParserTest extends BaseTestCase
     /** @test */
     public function has_many_through()
     {
-        $this->assertNull(FieldCommand::fromString("posts() via User", new ModelCommand('', '')));
+        $this->assertNull(FieldCommand::fromString('posts() via User', new ModelCommand('', '')));
     }
 
     /** @test */
@@ -1032,7 +1030,7 @@ class ParserTest extends BaseTestCase
     /** @test */
     public function referential_integrity()
     {
-        /** @see https://laravel.com/docs/5.6/migrations#foreign-key-constraints */
+        /* @see https://laravel.com/docs/5.6/migrations#foreign-key-constraints */
         $this->markTestIncomplete('TODO@slava: create test referential_integrity');
     }
 
