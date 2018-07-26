@@ -1,0 +1,6 @@
+vendor/
+.idea/
+app/
+src/todo
+src/schema.txt
+VERSION
