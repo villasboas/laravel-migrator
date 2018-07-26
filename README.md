@@ -73,19 +73,13 @@ Note: by default all generated fields are `nullable` (yes, you can change this t
 
 # Installation
 
-For now:
 ```
-"repositories": [
-  {
-    "type": "git",
-    "url": "https://github.com/slava-vishnyakov/laravel-migrator"
-  }
-],
-```
-
-```
-composer require --dev slava-vishnyakov/migrator
+composer require --dev slava-vishnyakov/laravel-migrator
 ``` 
+
+(The `--dev` flag is here because you don't need this on production servers, the migrations
+will be generated and run as usual without this package, the only caveat is that if you need
+to rename indexes - you need `"doctrine/dbal": "~2.0"` on production)
 
 ## Status: alpha testing, so be warned:
 
