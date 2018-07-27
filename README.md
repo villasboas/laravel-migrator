@@ -254,11 +254,11 @@ Comment
     post()
 ```
 
-Now we have `$post->comments()` and `$comment->posts()`. 
+Now we have `$post->comments()` and `$comment->post()`. 
 
 The field `post_id` will be created automatically in `comments` table.
 
-You can change it like this: `post() via my_post_id`.
+You can change the field name to `my_post_id` like this: `post() via my_post_id`.
 
 ## Different names
 
