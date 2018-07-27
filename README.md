@@ -262,8 +262,8 @@ You can change the field name to `my_post_id` like this: `post() via my_post_id`
 
 ## Different names
 
-What if we want to have `$post->remarks()`, but pointing to `Comment`?
-Also `$comment->parent()` returning `Post`? 
+What if we want to have methods named `remarks()` (instead of `comments()`), but pointing to `Comment`?
+Also `$comment->parent()` (instead of `post()`)? 
 Easy, just add a "return type".
 
 ```
