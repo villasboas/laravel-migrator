@@ -268,7 +268,7 @@ Easy, just add a "return type".
 
 ```
 Post
-    remarks() Comment[]
+    remarks(): Comment[]
     
 Comment
     parent() Post
