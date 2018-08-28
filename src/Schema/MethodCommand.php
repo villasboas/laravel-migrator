@@ -262,6 +262,10 @@ class MethodCommand extends Command
         }
 
         if ($this->returnsMany()) {
+            if ($this->selfReferencing()) {
+                return self::HAS_MANY;
+            }
+
             $inverseMethod = $this->inverseMethod();
 
             if ($inverseMethod->returnsOne()) {
@@ -922,5 +926,10 @@ class MethodCommand extends Command
     public function explicitManyToManyModel()
     {
         return $this->getSchema()->getModelByTableName($this->getPivotTableName());
+    }
+
+    public function selfReferencing()
+    {
+        return $this->getReturnTypeSingle() == self::getModel()->getShortName();
     }
 }

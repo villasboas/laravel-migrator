@@ -1640,4 +1640,38 @@ class MigratorTest extends BaseTestCase
         $tag2 = $this->newInstanceOf('Tag')->where('name', 'tag2')->first();
         $this->assertEquals([$video->name], $tag2->videos()->pluck('name')->all());
     }
+
+    /** @test */
+    public function self_reference()
+    {
+        $ns = $this->generateAndRun('
+            namespace {namespace}
+            Employee
+                name: string
+                boss() via boss_id: Employee <- Employee.employees()
+                employees(): Employee[] <- Employee.boss()
+        ');
+
+        $m = $this->migrator->getSchema()->getModel('Employee')->getMethod('boss');
+        $this->assertEquals('boss_id', $m->getVia());
+
+        $m = $this->migrator->getSchema()->getModel('Employee')->getMethod('employees');
+        $this->assertTrue($m->isHasMany());
+        $this->assertFalse($m->isBelongsTo());
+
+        $this->assertModelsContain("return \$this->belongsTo(\\$ns\\Employee::class, 'boss_id');");
+        $this->assertModelsContain("return \$this->hasMany(\\$ns\\Employee::class, 'boss_id');");
+
+        $boss = $this->newInstanceOf('Employee');
+        $boss->name = 'Boss';
+        $boss->save();
+
+        $jack = $boss->employees()->create(['name' => 'Jack']);
+        $boss->save();
+
+        $this->assertEquals('Boss', $jack->boss->name);
+        $this->assertEquals('Jack', $boss->employees[0]->name);
+    }
+
+
 }

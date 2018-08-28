@@ -89,6 +89,10 @@ class LaravelRelationMethodCallBuilder
             $belongsField = $this->commaQuotedArg($this->method->belongsToFieldName());
         }
 
+        if ($this->method->selfReferencing()) {
+            $belongsField = $this->commaQuotedArg($this->method->belongsToFieldName());
+        }
+
         if ($pk != 'id') {
             $otherPrimaryField = $this->commaQuotedArg($pk);
         }

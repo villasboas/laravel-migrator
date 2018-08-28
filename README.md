@@ -416,12 +416,12 @@ Tag
 
 # Self-reference (one to many)
 
-`Employee` can have many `Employees`.
+`Employee` can have many `Employees` (boss is defined via the field `boss_id`).
 
 ```
 Employee
     boss() via boss_id: Employee <- Employee.employees()
-    employees(): Employee[]
+    employees(): Employee[] <- Employee.boss()
 ```
 
 `<- Human.employees()` defines the inverse relationship.
