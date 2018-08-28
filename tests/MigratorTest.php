@@ -1672,6 +1672,4 @@ class MigratorTest extends BaseTestCase
         $this->assertEquals('Boss', $jack->boss->name);
         $this->assertEquals('Jack', $boss->employees[0]->name);
     }
-
-
 }
