@@ -4,8 +4,15 @@ Manage your database and models in Laravel 5.x by defining the target schema (mi
 
 ![](https://i.imgur.com/V4vtWvL.png)
 
-[![Watch the video](https://i.imgur.com/RGwVvCE.png)](https://www.youtube.com/watch?v=2jDL5Qlg0wo)
+# Installation
 
+```
+composer require --dev slava-vishnyakov/laravel-migrator
+``` 
+
+(The `--dev` flag is here because you don't need this on production servers, the migrations
+will be generated and run as usual without this package, the only caveat is that if you need
+to rename indexes - you need `"doctrine/dbal": "~2.0"` on production)
 
 # Example
 
@@ -75,16 +82,6 @@ and `human_id` on `pets` table.
 * ...probably something else too (read all about it below)  
 
 Note: by default all generated fields are `nullable` (yes, you can change this to default to `not nullable`, [see below](#null)).
-
-# Installation
-
-```
-composer require --dev slava-vishnyakov/laravel-migrator
-``` 
-
-(The `--dev` flag is here because you don't need this on production servers, the migrations
-will be generated and run as usual without this package, the only caveat is that if you need
-to rename indexes - you need `"doctrine/dbal": "~2.0"` on production)
 
 ## Status: alpha testing, so be warned:
 
