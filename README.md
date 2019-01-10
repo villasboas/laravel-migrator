@@ -2,7 +2,7 @@
 
 Manage your database and models in Laravel 5.x by defining the target schema (migrations are generated automatically).
 
-![](https://i.imgur.com/QeFB4Y1.png)
+![](https://i.imgur.com/V4vtWvL.png)
 
 [![Watch the video](https://i.imgur.com/RGwVvCE.png)](https://www.youtube.com/watch?v=2jDL5Qlg0wo)
 
