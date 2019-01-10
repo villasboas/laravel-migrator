@@ -235,8 +235,5 @@ class GeoRect extends Model
         $this->assertContains('last_sold', $this->getModelContents('Item'));
         $this->assertContains("protected \$dates = [\n        'last_bought',\n        'last_sold',\n    ];\n",
             $this->getModelContents('Item'));
-
     }
-
-
 }
