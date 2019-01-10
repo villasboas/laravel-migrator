@@ -125,18 +125,18 @@ class MergeModelFiles
             if (!str_contains($content, '$dates')) {
                 $content = preg_replace(
                     '/(class\s+([\s\S]*?)\{)/s',
-                    "\\1\n    " . trim($this->model->dates()) . "\n",
+                    "\\1\n    ".trim($this->model->dates())."\n",
                     $content
                 );
             } else {
                 $regex = 'protected\s+(?P<dates>\$dates[\s\S]*?\]\s*;)';
-                preg_match('#' . $regex . '#', $content, $m);
+                preg_match('#'.$regex.'#', $content, $m);
 
                 try {
                     eval($m['dates']);
                     /** @var string $dates from eval */
                     $dates = array_unique(array_merge($dates, $this->model->dateFields()));
-                    $content = preg_replace('#' . $regex . '#', trim($this->model->dates($dates)), $content);
+                    $content = preg_replace('#'.$regex.'#', trim($this->model->dates($dates)), $content);
                 } catch (\Exception $e) {
                 }
             }

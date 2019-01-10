@@ -160,7 +160,6 @@ class ModelBuilder
         return $dates;
     }
 
-
     public function methods()
     {
         return implode("\n\n", $this->singleMethods());
