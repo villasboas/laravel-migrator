@@ -206,4 +206,37 @@ class GeoRect extends Model
         $newContent2 = file_get_contents($tmp);
         $this->assertEquals($newContent, $newContent2);
     }
+
+    /** @test */
+    public function merges_datetime()
+    {
+        $ns = $this->generateAndRun('
+            namespace {namespace}
+            Item
+        ');
+
+        $ns = $this->generateAndRun('
+            namespace {namespace}
+            Item
+                last_bought: datetime
+        ');
+
+        $this->assertContains('last_bought', $this->getModelContents('Item'));
+        $this->assertContains("protected \$dates = [\n        'last_bought',\n    ];\n",
+            $this->getModelContents('Item'));
+
+        $ns = $this->generateAndRun('
+            namespace {namespace}
+            Item
+                last_bought: datetime
+                last_sold: datetime
+        ');
+
+        $this->assertContains('last_sold', $this->getModelContents('Item'));
+        $this->assertContains("protected \$dates = [\n        'last_bought',\n        'last_sold',\n    ];\n",
+            $this->getModelContents('Item'));
+
+    }
+
+
 }

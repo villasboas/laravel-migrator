@@ -133,19 +133,33 @@ class ModelBuilder
         return $casts;
     }
 
-    private function dates()
+    public function dateFields()
+    {
+        $res = [];
+        if ($fields = $this->model->getFieldsWithType(['datetime', 'date', 'dateTimeTz'])) {
+            foreach ($fields as $field) {
+                $res[] = $field->getName();
+            }
+        }
+
+        return $res;
+    }
+
+    public function dates($dateFields = null)
     {
         $dates = '';
-        if ($fields = $this->model->getFieldsWithType(['datetime', 'date', 'dateTimeTz'])) {
+        $toCast = $dateFields ?: $this->dateFields();
+        if ($toCast) {
             $dates = "\n    protected \$dates = [\n";
-            foreach ($fields as $field) {
-                $dates .= "        '{$field->getName()}',\n";
+            foreach ($toCast as $_ => $name) {
+                $dates .= "        '$name',\n";
             }
             $dates .= '    ];';
         }
 
         return $dates;
     }
+
 
     public function methods()
     {

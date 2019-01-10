@@ -103,10 +103,15 @@ trait GenerateAndRun
 
     private function dumpModels($filterNames = null)
     {
-        if (empty($this->migrator->modelsCreated)) {
+        if (empty($this->migrator->modelsCreated) && empty($this->migrator->modelsUpdated)) {
             echo "[!!] No models were created!\n\n";
         }
         foreach ($this->migrator->modelsCreated as $file => $contents) {
+            if ($filterNames === null || str_contains(strtolower($file), strtolower($filterNames))) {
+                echo "-------\n$file\n-------\n$contents\n-------\n\n";
+            }
+        }
+        foreach ($this->migrator->modelsUpdated as $file => $contents) {
             if ($filterNames === null || str_contains(strtolower($file), strtolower($filterNames))) {
                 echo "-------\n$file\n-------\n$contents\n-------\n\n";
             }
