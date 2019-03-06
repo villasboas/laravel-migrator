@@ -160,7 +160,7 @@ class Field
         $tableName = $this->tableName;
 
         return $this->getSchemaManager()->listTableColumns($tableName)[$this->getName()] ??
-            $this->getSchemaManager()->listTableColumns($tableName)['"' . $this->getName() . '"'];
+            $this->getSchemaManager()->listTableColumns($tableName)['"'.$this->getName().'"'];
     }
 
     /**
