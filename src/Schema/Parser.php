@@ -184,7 +184,7 @@ class Parser
         if ($m) {
             $name = $m->getShortName();
 
-            if ($name == str_plural($name)) {
+            if ($name == Str::plural($name)) {
                 throw new RuntimeException("You are using plural \"{$name}\" as model name");
             }
         }

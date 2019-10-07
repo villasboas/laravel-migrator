@@ -342,7 +342,7 @@ class MethodCommand extends Command
             // skip, if there is not other method - then we can do nothing here
         }
 
-        return str_singular($this->name).'_id';
+        return Str::singular($this->name) . '_id';
     }
 
     public function isBelongsFieldDefault()
@@ -364,8 +364,8 @@ class MethodCommand extends Command
     public function inverseMethod()
     {
         $otherModel = $this->guessInverseModelName();
-        $otherMethodSingular = str_singular(snake_case($this->modelShortName()));
-        $otherMethodPlural = str_plural(snake_case($this->modelShortName()));
+        $otherMethodSingular = Str::singular(Str::snake($this->modelShortName()));
+        $otherMethodPlural = Str::plural(Str::snake($this->modelShortName()));
 
         if ($this->getInverseOf()) {
             return $this->getInverseOfMethod();
@@ -407,8 +407,8 @@ class MethodCommand extends Command
     {
         $field = $this->belongsToFieldName();
 
-        $otherMethod = str_plural(snake_case($this->modelShortName()));
-        $otherModel = studly_case($this->name);
+        $otherMethod = Str::plural(Str::snake($this->modelShortName()));
+        $otherModel = Str::studly($this->name);
 
         $message = "Method `{$this->humanName()}` returns only one thing, so it is probably of type ".
             "`Belongs To`, which requires field `$field`, but I'm not sure if I should create it ".
@@ -436,7 +436,7 @@ class MethodCommand extends Command
             return ends_with($this->getReturnType(), '[]');
         }
 
-        return $this->name == str_plural($this->name);
+        return $this->name == Str::plural($this->name);
     }
 
     private function throwOneToOneConfusing(): void
@@ -485,10 +485,10 @@ class MethodCommand extends Command
     public function getReturnType()
     {
         if (!$this->returnType) {
-            if ($this->name == str_plural($this->name)) {
-                return studly_case(str_singular($this->name)).'[]';
+            if ($this->name == Str::plural($this->name)) {
+                return Str::studly(Str::singular($this->name)) . '[]';
             } else {
-                return studly_case($this->name);
+                return Str::studly($this->name);
             }
         }
 
@@ -558,7 +558,7 @@ class MethodCommand extends Command
             return $this->getReturnTypeSingle();
         }
 
-        return str_singular(studly_case($this->name));
+        return Str::singular(Str::studly($this->name));
     }
 
     /**
@@ -774,8 +774,8 @@ class MethodCommand extends Command
             return;
         }
 
-        $table1 = str_singular($this->getModel()->getTableName());
-        $table2 = str_singular($this->inverseMethod()->getModel()->getTableName());
+        $table1 = Str::singular($this->getModel()->getTableName());
+        $table2 = Str::singular($this->inverseMethod()->getModel()->getTableName());
 
         return collect([$table1, $table2])->sort()->implode('_');
     }
@@ -842,7 +842,7 @@ class MethodCommand extends Command
             return;
         }
 
-        return str_singular($this->name).'_id';
+        return Str::singular($this->name) . '_id';
     }
 
     public function getPivotTableDefinitionFields()

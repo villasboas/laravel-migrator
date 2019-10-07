@@ -2,6 +2,8 @@
 
 namespace Migrator\Schema\Migrator;
 
+use Illuminate\Support\Str;
+
 class MigrationFile
 {
     private static $migrationNumber = 0;
@@ -12,14 +14,14 @@ class MigrationFile
 
         $n = 0;
         do {
-            $class = 'Create'.studly_case($t->getName()).'Table'.($n > 0 ? "{$n}" : '');
+            $class = 'Create' . Str::studly($t->getName()) . 'Table' . ($n > 0 ? "{$n}" : '');
             if ($isChange) {
-                $class = 'Update'.studly_case($t->getName()).'Table'.($n > 0 ? "{$n}" : '');
+                $class = 'Update' . Str::studly($t->getName()) . 'Table' . ($n > 0 ? "{$n}" : '');
             }
             $n++;
         } while (isset($classes[$class]) || class_exists($class) || self::classFileExists($class));
 
-        $filename = sprintf('%s%03d_%s.php', date('Y_m_d_His'), self::$migrationNumber, snake_case($class));
+        $filename = sprintf('%s%03d_%s.php', date('Y_m_d_His'), self::$migrationNumber, Str::snake($class));
         $contents = require __DIR__.'/migration_template.php';
         self::$migrationNumber++;
 
@@ -33,7 +35,7 @@ class MigrationFile
      */
     public static function classFileExists($class): bool
     {
-        return count(glob(database_path('migrations/*_'.snake_case($class).'.php'))) > 0;
+        return count(glob(database_path('migrations/*_' . Str::snake($class) . '.php'))) > 0;
     }
 
     /**

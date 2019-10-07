@@ -38,7 +38,7 @@ class ModelCommand extends Command
             $this->namespace = $namespace;
             $this->fullName = $namespace.$name;
         }
-        $this->tableName = str_plural(snake_case($this->shortName));
+        $this->tableName = Str::plural(Str::snake($this->shortName));
     }
 
     public static function fromString($line, $namespace)
