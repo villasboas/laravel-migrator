@@ -110,7 +110,7 @@ class ModelBuilder
         if ($fields = $this->model->getFieldsWithType(['json', 'jsonb', 'collection', 'array'])) {
             $map = ['jsonb' => 'json'];
             foreach ($fields as $field) {
-                $type = array_get($map, $field->getFieldType(), $field->getFieldType());
+                $type = data_get($map, $field->getFieldType(), $field->getFieldType());
                 $res[$field->getName()] = $type;
             }
         }

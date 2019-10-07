@@ -3,6 +3,7 @@
 namespace Migrator\Schema;
 
 use Exception;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Migrator\Schema\Exceptions\InverseMethodNotFound;
 use Migrator\Schema\Exceptions\MultipleModelsWithSameShortName;
@@ -65,10 +66,10 @@ class MethodCommand extends Command
 
         $d = new self($m['name']);
         $d->setModel($model);
-        $d->setVia(array_get($m, 'via'));
-        $d->setReturnType(array_get($m, 'return_type'));
+        $d->setVia(data_get($m, 'via'));
+        $d->setReturnType(data_get($m, 'return_type'));
 
-        $d->parseTags(array_get($m, 'tags'));
+        $d->parseTags(data_get($m, 'tags'));
 
         return $d;
     }
@@ -94,12 +95,12 @@ class MethodCommand extends Command
         $tags = preg_split('#,\s*#', $tagString); // TODO: probably too naive
         foreach ($tags as $tag) {
             if (preg_match($joinStringRx, $tag, $m1)) {
-                $this->setJoinString(array_get($m1, 'join_string'));
+                $this->setJoinString(data_get($m1, 'join_string'));
                 $this->parseJoin();
             } elseif (preg_match($inverseOfRx, $tag, $m1)) {
-                $this->setInverseOf(array_get($m1, 'inverse_of'));
+                $this->setInverseOf(data_get($m1, 'inverse_of'));
             } elseif (preg_match($asRx, $tag, $m1)) {
-                $this->setAs(array_get($m1, 'as1', '').array_get($m1, 'as2', ''));
+                $this->setAs(data_get($m1, 'as1', '') . data_get($m1, 'as2', ''));
             } elseif (preg_match($pivotWithTimestampsRx, $tag, $m1)) {
                 $this->pivotWithTimestamps = true;
             } elseif (preg_match($notNullRx, $tag, $m1)) {
@@ -135,7 +136,7 @@ class MethodCommand extends Command
             throw new RuntimeException('Cannot parse join: '.$this->getJoinString());
         }
 
-        $results = array_except($match, range(0, 20)); // remove non-named matches
+        $results = Arr::except($match, range(0, 20)); // remove non-named matches
 
         if (isset($results['cond2_l_table'])) {
             $tables = [

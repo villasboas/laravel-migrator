@@ -3,6 +3,7 @@
 namespace Migrator\Schema;
 
 use Migrator\Schema\Migrator\Field;
+use RuntimeException;
 
 class FieldCommand extends Command
 {
@@ -42,11 +43,11 @@ class FieldCommand extends Command
             return;
         }
 
-        $fieldType = array_get($m, 'type', '').array_get($m, 'numbered_type', '').array_get($m, 'enum_type', '');
+        $fieldType = data_get($m, 'type', '') . data_get($m, 'numbered_type', '') . data_get($m, 'enum_type', '');
 
         $d = new self($m['name'], $fieldType);
         $d->setModel($model);
-        $d->parseTags(array_get($m, 'tags'));
+        $d->parseTags(data_get($m, 'tags'));
         if (isset($m['param1'])) {
             $d->setParam1((int) $m['param1']);
         }
@@ -98,7 +99,7 @@ class FieldCommand extends Command
             } elseif (preg_match($defaultRx, $tag, $m1)) {
                 $this->defaultValue = $m1['default_value'];
             } else {
-                throw new \RuntimeException("Cannot parse tag for field \"{$this->getModel()->getShortName()}.{$this->name}\": '$tag'");
+                throw new RuntimeException("Cannot parse tag for field \"{$this->getModel()->getShortName()}.{$this->name}\": '$tag'");
             }
         }
     }
