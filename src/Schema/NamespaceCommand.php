@@ -2,6 +2,9 @@
 
 namespace Migrator\Schema;
 
+use Illuminate\Support\Str;
+use RuntimeException;
+
 class NamespaceCommand extends Command
 {
     public $namespace;
@@ -39,11 +42,11 @@ class NamespaceCommand extends Command
             if ($ns == '\\App\\') {
                 $m['path'] = 'app/';
             }
-            if (starts_with($ns, '\\App\\')) {
+            if (Str::startsWith($ns, '\\App\\')) {
                 $path = preg_replace('/^\\\\App\\\\/', 'app\\', $ns);
                 $m['path'] = str_replace('\\', '/', $path);
             } else {
-                throw new \RuntimeException("Cannot infer what path should be for namespace {$m['namespace']}, use form `namespace {$m['namespace']} app/Path/Path`");
+                throw new RuntimeException("Cannot infer what path should be for namespace {$m['namespace']}, use form `namespace {$m['namespace']} app/Path/Path`");
             }
         }
 

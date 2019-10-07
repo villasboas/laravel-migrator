@@ -3,8 +3,11 @@
 namespace Migrator\Tests;
 
 use DB;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Str;
 use Migrator\Migrator;
+use ParseError;
 
 trait GenerateAndRun
 {
@@ -59,7 +62,7 @@ trait GenerateAndRun
 
         try {
             $this->migrator->migrate($string, true, false);
-        } catch (\ParseError $e) {
+        } catch (ParseError $e) {
             $this->dump();
 
             throw $e;
@@ -75,7 +78,7 @@ trait GenerateAndRun
      */
     private function replaceNamespace($string)
     {
-        if (str_contains($string, '{namespace}')) {
+        if (Str::contains($string, '{namespace}')) {
             $this->ns = "App\Models\TestNs".(self::$namespaceNumber);
             $string = str_replace('{namespace}', $this->ns, $string);
         }
@@ -95,7 +98,7 @@ trait GenerateAndRun
             echo "[!!] No migrations were created!\n\n";
         }
         foreach ($this->migrator->migrationsCreated as $file => $contents) {
-            if ($filter === null || str_contains(strtolower($file), strtolower($filter))) {
+            if ($filter === null || Str::contains(strtolower($file), strtolower($filter))) {
                 echo "-------\n$file\n-------\n$contents\n-------\n\n";
             }
         }
@@ -107,12 +110,12 @@ trait GenerateAndRun
             echo "[!!] No models were created!\n\n";
         }
         foreach ($this->migrator->modelsCreated as $file => $contents) {
-            if ($filterNames === null || str_contains(strtolower($file), strtolower($filterNames))) {
+            if ($filterNames === null || Str::contains(strtolower($file), strtolower($filterNames))) {
                 echo "-------\n$file\n-------\n$contents\n-------\n\n";
             }
         }
         foreach ($this->migrator->modelsUpdated as $file => $contents) {
-            if ($filterNames === null || str_contains(strtolower($file), strtolower($filterNames))) {
+            if ($filterNames === null || Str::contains(strtolower($file), strtolower($filterNames))) {
                 echo "-------\n$file\n-------\n$contents\n-------\n\n";
             }
         }
@@ -129,7 +132,7 @@ trait GenerateAndRun
 
         try {
             $this->migrator->migrate($string);
-        } catch (\ParseError $e) {
+        } catch (ParseError $e) {
             $this->dump();
 
             throw $e;
@@ -141,7 +144,7 @@ trait GenerateAndRun
     /**
      * @param $className
      *
-     * @return mixed|\Illuminate\Database\Eloquent\Model
+     * @return mixed|Model
      */
     private function newInstanceOf($className)
     {
@@ -232,9 +235,9 @@ trait GenerateAndRun
     {
         $found = false;
         foreach ($this->migrator->migrationsCreated as $file => $contents) {
-            if ($filterNames === null || str_contains(strtolower($file), strtolower($filterNames))) {
+            if ($filterNames === null || Str::contains(strtolower($file), strtolower($filterNames))) {
                 $found = true;
-                if (str_contains($contents, $what)) {
+                if (Str::contains($contents, $what)) {
                     $this->dumpMigrations($filterNames);
                     $this->fail("Migrations (filter: '$filterNames') do contain: '$what' (but should not)");
 
@@ -254,9 +257,9 @@ trait GenerateAndRun
     {
         $found = false;
         foreach ($this->migrator->migrationsCreated as $file => $contents) {
-            if ($filterNames === null || str_contains(strtolower($file), strtolower($filterNames))) {
+            if ($filterNames === null || Str::contains(strtolower($file), strtolower($filterNames))) {
                 $found = true;
-                if (str_contains($contents, $what)) {
+                if (Str::contains($contents, $what)) {
                     $this->assertTrue(true);
 
                     return;
@@ -277,9 +280,9 @@ trait GenerateAndRun
         $found = false;
         $models = array_merge($this->migrator->modelsCreated, $this->migrator->modelsUpdated);
         foreach ($models as $file => $contents) {
-            if ($filterNames === null || str_contains(strtolower($file), strtolower($filterNames))) {
+            if ($filterNames === null || Str::contains(strtolower($file), strtolower($filterNames))) {
                 $found = true;
-                if (str_contains($contents, $what)) {
+                if (Str::contains($contents, $what)) {
                     $this->assertTrue(true);
 
                     return;

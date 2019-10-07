@@ -4,6 +4,9 @@
 
 namespace Migrator\Schema\Migrator;
 
+use Exception;
+use Illuminate\Support\Str;
+
 class MergeModelFiles
 {
     private $fullPath;
@@ -60,7 +63,7 @@ class MergeModelFiles
     private function mergeCasts($content)
     {
         if ($this->model->castFields()) {
-            if (!str_contains($content, '$casts')) {
+            if (!Str::contains($content, '$casts')) {
                 $content = preg_replace(
                     '/(class\s+([\s\S]*?)\{)/s',
                     "\\1\n    ".trim($this->model->casts())."\n",
@@ -75,7 +78,7 @@ class MergeModelFiles
                     /** @var string $casts from eval */
                     $casts = array_merge($casts, $this->model->castFields());
                     $content = preg_replace('#'.$regex.'#', trim($this->model->casts($casts)), $content);
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                 }
             }
         }
@@ -91,7 +94,7 @@ class MergeModelFiles
     private function mergeGuarded($content)
     {
         if ($this->model->guardedFieldNames()) {
-            if (!str_contains($content, '$guarded')) {
+            if (!Str::contains($content, '$guarded')) {
                 $content = preg_replace(
                     '/(class\s+([\s\S]*?)\{)/s',
                     "\\1\n    ".trim($this->model->guarded())."\n",
@@ -106,7 +109,7 @@ class MergeModelFiles
                     /** @var string $guarded from eval */
                     $guarded = array_unique(array_merge($guarded, $this->model->guardedFieldNames()));
                     $content = preg_replace('#'.$regex.'#', trim($this->model->guarded($guarded)), $content);
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                 }
             }
         }
@@ -122,7 +125,7 @@ class MergeModelFiles
     private function mergeDates($content)
     {
         if ($this->model->dateFields()) {
-            if (!str_contains($content, '$dates')) {
+            if (!Str::contains($content, '$dates')) {
                 $content = preg_replace(
                     '/(class\s+([\s\S]*?)\{)/s',
                     "\\1\n    ".trim($this->model->dates())."\n",
@@ -137,7 +140,7 @@ class MergeModelFiles
                     /** @var string $dates from eval */
                     $dates = array_unique(array_merge($dates, $this->model->dateFields()));
                     $content = preg_replace('#'.$regex.'#', trim($this->model->dates($dates)), $content);
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                 }
             }
         }

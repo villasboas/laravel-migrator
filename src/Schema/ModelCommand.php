@@ -2,10 +2,12 @@
 
 namespace Migrator\Schema;
 
+use Illuminate\Support\Str;
 use Migrator\Schema\Exceptions\InverseMethodNotFound;
 use Migrator\Schema\Exceptions\MethodNotFound;
 use Migrator\Schema\Exceptions\MultipleModelsWithSameShortName;
 use Migrator\Schema\Migrator\TableDefinition;
+use RuntimeException;
 
 class ModelCommand extends Command
 {
@@ -26,7 +28,7 @@ class ModelCommand extends Command
 
     public function __construct($name, $namespace)
     {
-        if (str_contains($name, '\\')) {
+        if (Str::contains($name, '\\')) {
             preg_match('#^(?P<namespace>.*?)\\\\(?P<short_name>[^\\\\]*?)$#', $name, $m);
             $this->name = $this->shortName = $m['short_name'];
             $this->namespace = $m['namespace'];
@@ -216,7 +218,7 @@ class ModelCommand extends Command
             }
         }
 
-        throw new \RuntimeException("Field \"$name\" in the model \"{$this->shortName}\" not found");
+        throw new RuntimeException("Field \"$name\" in the model \"{$this->shortName}\" not found");
     }
 
     /**
@@ -326,12 +328,12 @@ class ModelCommand extends Command
     {
         $pks = $this->getPrimaryKeyFieldNames();
         if (count($pks) == 0) {
-            throw new \RuntimeException("Model `{$this->getShortName()}` has no primary key, but $but");
+            throw new RuntimeException("Model `{$this->getShortName()}` has no primary key, but $but");
         }
         if (count($pks) != 1) {
             $join = implode(',', $pks);
 
-            throw new \RuntimeException("Model `{$this->getShortName()}` has a complex primary key ($join), $but");
+            throw new RuntimeException("Model `{$this->getShortName()}` has a complex primary key ($join), $but");
         }
 
         return $pks[0];
@@ -426,13 +428,13 @@ class ModelCommand extends Command
             }
             if ($command->isRenameIndex() && $command->getArg1() == $indexName) {
                 // we will rename $indexName to other name.. probably user forgot
-                throw new \RuntimeException("You have a `RENAME INDEX $indexName` command and you also try to ".
+                throw new RuntimeException("You have a `RENAME INDEX $indexName` command and you also try to " .
                     "create Index($indexName) on a field `{$field->humanName()}`. You probably want to ".
                     "update the name of index to Index({$command->getArg2()})");
             }
             if ($command->isDeleteIndex() && $command->getArg1() == $indexName) {
                 // we will delete $indexName, so it's an error to try to create it
-                throw new \RuntimeException("You have a `DELETE INDEX $indexName` command and you also try to ".
+                throw new RuntimeException("You have a `DELETE INDEX $indexName` command and you also try to " .
                     "create Index($indexName) on a field `{$field->humanName()}`. You probably want to ".
                     'update delete that.');
             }
@@ -455,7 +457,7 @@ class ModelCommand extends Command
                 return true;
             }
             if ($command->isRenameField() && $command->getArg1() == $field->getName()) {
-                throw new \RuntimeException("You have a `RENAME FIELD {$field->getName()}` command and you also try to ".
+                throw new RuntimeException("You have a `RENAME FIELD {$field->getName()}` command and you also try to " .
                     "create the same field `{$field->getName()}` (in {$field->getModel()->getShortName()}). ".
                     "You probably want to change the field name to `{$command->getArg2()}`");
             }

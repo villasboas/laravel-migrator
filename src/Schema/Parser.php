@@ -2,7 +2,9 @@
 
 namespace Migrator\Schema;
 
+use Illuminate\Support\Str;
 use Migrator\Schema\Exceptions\ParseFailure;
+use RuntimeException;
 
 /**
  * Class Parser.
@@ -38,7 +40,7 @@ class Parser
             if ($result instanceof ParseFailure) {
                 $i++;
 
-                throw new \RuntimeException("Cannot parse: line $i: ".trim($line));
+                throw new RuntimeException("Cannot parse: line $i: " . trim($line));
             }
 
             if ($result instanceof Command) {
@@ -59,7 +61,7 @@ class Parser
             if ($result->getCommandType() == 'Model') {
                 /** @var ModelCommand $result */
                 if ($oldModel = $schema->getModelByTableName($result->getTableName())) {
-                    throw new \RuntimeException("There are two models with table_name is `{$result->getTableName()}`: {$oldModel->getShortName()} and {$result->getShortName()}. You must have exactly 1 Model for 1 Table.");
+                    throw new RuntimeException("There are two models with table_name is `{$result->getTableName()}`: {$oldModel->getShortName()} and {$result->getShortName()}. You must have exactly 1 Model for 1 Table.");
                 }
                 $this->currentModel = $schema->addModel($result);
             }
@@ -121,7 +123,7 @@ class Parser
 
     private function isCommentLine($line)
     {
-        return starts_with(ltrim($line), '#');
+        return Str::startsWith(ltrim($line), '#');
     }
 
     private function getIndent($line)
@@ -183,7 +185,7 @@ class Parser
             $name = $m->getShortName();
 
             if ($name == str_plural($name)) {
-                throw new \RuntimeException("You are using plural \"{$name}\" as model name");
+                throw new RuntimeException("You are using plural \"{$name}\" as model name");
             }
         }
 

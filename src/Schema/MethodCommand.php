@@ -2,9 +2,12 @@
 
 namespace Migrator\Schema;
 
+use Exception;
+use Illuminate\Support\Str;
 use Migrator\Schema\Exceptions\InverseMethodNotFound;
 use Migrator\Schema\Exceptions\MultipleModelsWithSameShortName;
 use Migrator\Schema\Migrator\Field;
+use RuntimeException;
 
 class MethodCommand extends Command
 {
@@ -104,7 +107,7 @@ class MethodCommand extends Command
             } elseif (preg_match($nullRx, $tag, $m1)) {
                 $this->isNullable = true;
             } else {
-                throw new \RuntimeException("Cannot parse tag for method \"{$this->modelShortName()}.{$this->name}()\": '$tag'");
+                throw new RuntimeException("Cannot parse tag for method \"{$this->modelShortName()}.{$this->name}()\": '$tag'");
             }
         }
     }
@@ -129,7 +132,7 @@ class MethodCommand extends Command
         $joinRegex = "/^\\s*$condition1((\\s+AND\\s+$condition2)\\s*)?\$/";
 
         if (!preg_match($joinRegex, $this->getJoinString(), $match)) {
-            throw new \RuntimeException('Cannot parse join: '.$this->getJoinString());
+            throw new RuntimeException('Cannot parse join: ' . $this->getJoinString());
         }
 
         $results = array_except($match, range(0, 20)); // remove non-named matches
@@ -144,7 +147,7 @@ class MethodCommand extends Command
             $number = array_values(array_count_values($tables));
             sort($number);
             if ($number != [1, 1, 2]) {
-                throw new \RuntimeException('Joins with "AND" are currently used only for many-to-many relations '.
+                throw new RuntimeException('Joins with "AND" are currently used only for many-to-many relations ' .
                     'and so should reference the same table twice, like this: '.
                     '"table1.X = table2.Y AND table2.Z = table3.A" '.
                     "see: \"{$this->getJoinString()}\"");
@@ -189,7 +192,7 @@ class MethodCommand extends Command
             if (empty($this->joinString) && $this->inverseMethod()->joinString) {
                 return $this->inverseMethod()->joinString;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // it's ok, we tried..
         }
 
@@ -304,12 +307,12 @@ class MethodCommand extends Command
      */
     private function isReturnTypePolymorphic(): bool
     {
-        return str_contains($this->getReturnType(), '|');
+        return Str::contains($this->getReturnType(), '|');
     }
 
     private function hasPivotJoin()
     {
-        return str_contains($this->getJoinString(), ' AND ');
+        return Str::contains($this->getJoinString(), ' AND ');
     }
 
     /**
@@ -380,12 +383,12 @@ class MethodCommand extends Command
 
             try {
                 return $model->getMethod($otherMethodPlural);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
             }
 
             try {
                 return $model->getMethod($otherMethodSingular);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
             }
         } else {
             $hint = "we tried to guess it was in the model `{$otherModel}`, but the model was not found";
@@ -413,7 +416,7 @@ class MethodCommand extends Command
             "or define field in model `{$this->modelShortName()}` as `$this->name() via $field` ".
             "or as `$field: integer` field)";
 
-        throw new \RuntimeException($message);
+        throw new RuntimeException($message);
     }
 
     /**
@@ -447,7 +450,7 @@ class MethodCommand extends Command
             "To resolve it: if $This (usually) belongs to $That - then add `$thisLower() via {$thisLower}_id` to $This; ".
             "otherwise if $That (usually) belongs to $This - then add `{$thatLower}() via {$thatLower}_id` to $That.";
 
-        throw new \RuntimeException($message);
+        throw new RuntimeException($message);
     }
 
     /**
@@ -516,7 +519,7 @@ class MethodCommand extends Command
                 $did = ", did you mean just `$without` instead of `{$returnType}`?";
             }
 
-            throw new \RuntimeException("Your `{$this->humanName()}` method asks for polymorphic relation with array, I am not sure how to do it$did");
+            throw new RuntimeException("Your `{$this->humanName()}` method asks for polymorphic relation with array, I am not sure how to do it$did");
         }
     }
 
@@ -678,7 +681,7 @@ class MethodCommand extends Command
         $l = preg_replace('/\(\)/', '', $this->getInverseOf());
         $p = explode('.', $l);
         if (count($p) != 2) {
-            throw new \RuntimeException('Inverse of (<-) should be in format `Model.method()`');
+            throw new RuntimeException('Inverse of (<-) should be in format `Model.method()`');
         }
 
         return $p;
@@ -713,7 +716,7 @@ class MethodCommand extends Command
                 return $methods[0];
             }
             if (count($methods) == 0) {
-                throw new \RuntimeException("There is no method returning `{$this->modelShortName()}` in `{$otherModel->getShortName()}`");
+                throw new RuntimeException("There is no method returning `{$this->modelShortName()}` in `{$otherModel->getShortName()}`");
             }
         }
     }
@@ -871,7 +874,7 @@ class MethodCommand extends Command
         $modelOrTable = $this->modelShortName();
         $p = $this->parseJoinToPairsForModelOrTable($modelOrTable);
         if (count($p) == 0) {
-            throw new \RuntimeException("Trying to parse '{$this->getJoinString()}' I needed to find part that matches table or model $modelOrTable, but couldn't");
+            throw new RuntimeException("Trying to parse '{$this->getJoinString()}' I needed to find part that matches table or model $modelOrTable, but couldn't");
         }
 
         return $p[0]['field2'];
