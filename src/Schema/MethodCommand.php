@@ -132,7 +132,7 @@ class MethodCommand extends Command
         $joinRegex = "/^\\s*$condition1((\\s+AND\\s+$condition2)\\s*)?\$/";
 
         if (!preg_match($joinRegex, $this->getJoinString(), $match)) {
-            throw new RuntimeException('Cannot parse join: ' . $this->getJoinString());
+            throw new RuntimeException('Cannot parse join: '.$this->getJoinString());
         }
 
         $results = array_except($match, range(0, 20)); // remove non-named matches
@@ -147,7 +147,7 @@ class MethodCommand extends Command
             $number = array_values(array_count_values($tables));
             sort($number);
             if ($number != [1, 1, 2]) {
-                throw new RuntimeException('Joins with "AND" are currently used only for many-to-many relations ' .
+                throw new RuntimeException('Joins with "AND" are currently used only for many-to-many relations '.
                     'and so should reference the same table twice, like this: '.
                     '"table1.X = table2.Y AND table2.Z = table3.A" '.
                     "see: \"{$this->getJoinString()}\"");

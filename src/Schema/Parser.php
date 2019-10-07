@@ -40,7 +40,7 @@ class Parser
             if ($result instanceof ParseFailure) {
                 $i++;
 
-                throw new RuntimeException("Cannot parse: line $i: " . trim($line));
+                throw new RuntimeException("Cannot parse: line $i: ".trim($line));
             }
 
             if ($result instanceof Command) {
