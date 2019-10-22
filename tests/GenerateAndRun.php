@@ -18,7 +18,7 @@ trait GenerateAndRun
     /** @var Migrator */
     private $migrator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         self::$namespaceNumber++;
@@ -39,7 +39,7 @@ trait GenerateAndRun
         }
     }
 
-    protected function tearDown()
+    protected function tearDown():void
     {
         DB::rollBack();
         foreach ($this->migrator->getCreatedFileNames() as $file) {

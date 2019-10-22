@@ -919,7 +919,7 @@ class MigratorTest extends BaseTestCase
                 user() via user_id
         ');
 
-        $this->assertContains('phone()', $this->getModelContents('User'));
+        $this->assertStringContainsString('phone()', $this->getModelContents('User'));
         //$this->dumpModels();
 
         $user = $this->newInstanceOf('User')->create();
@@ -964,7 +964,7 @@ class MigratorTest extends BaseTestCase
                 user() via user_id
         ');
 
-        $this->assertContains('phone()', $this->getModelContents('User'));
+        $this->assertStringContainsString('phone()', $this->getModelContents('User'));
         //$this->dumpModels();
 
         $user = $this->newInstanceOf('User')->create();

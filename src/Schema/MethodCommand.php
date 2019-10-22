@@ -434,7 +434,7 @@ class MethodCommand extends Command
     public function returnsMany()
     {
         if ($this->returnType) {
-            return ends_with($this->getReturnType(), '[]');
+            return Str::endsWith($this->getReturnType(), '[]');
         }
 
         return $this->name == Str::plural($this->name);
@@ -515,7 +515,7 @@ class MethodCommand extends Command
             $this->returnType = $old;
 
             $did = '.';
-            if (ends_with($returnType, '[]')) {
+            if (Str::endsWith($returnType, '[]')) {
                 $without = preg_replace('#\[\]$#', '', $returnType);
                 $did = ", did you mean just `$without` instead of `{$returnType}`?";
             }
@@ -534,7 +534,7 @@ class MethodCommand extends Command
             return false;
         }
 
-        return !ends_with($this->via, '()');
+        return !Str::endsWith($this->via, '()');
     }
 
     public function joinCreatesField()

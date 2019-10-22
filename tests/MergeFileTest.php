@@ -105,9 +105,9 @@ class MergeFileTest extends BaseTestCase
                 js2: json 
         ');
 
-        $this->assertContains('$casts', $this->getModelContents('User'));
-        $this->assertContains('js1', $this->getModelContents('User'));
-        $this->assertContains('js2', $this->getModelContents('User'));
+        $this->assertStringContainsString('$casts', $this->getModelContents('User'));
+        $this->assertStringContainsString('js1', $this->getModelContents('User'));
+        $this->assertStringContainsString('js2', $this->getModelContents('User'));
 
         $user = $this->newInstanceOf('User')->create(['js1' => [1], 'js2' => [2]]);
         $this->assertEquals([1], $this->newInstanceOf('User')->first()->js1);
@@ -137,8 +137,8 @@ class GeoRect extends Model
         $model->addField($field);
         (new MergeModelFiles($tmp, new ModelBuilder($tmp, 'GeoRect', $model)))->merge();
         $newContent = file_get_contents($tmp);
-        $this->assertContains('$guarded', $newContent);
-        $this->assertNotContains("\n\n\n", $newContent);
+        $this->assertStringContainsString('$guarded', $newContent);
+        $this->assertStringNotContainsString("\n\n\n", $newContent);
 
         // should not change
         (new MergeModelFiles($tmp, new ModelBuilder($tmp, 'GeoRect', $model)))->merge();
@@ -163,9 +163,9 @@ class GeoRect extends Model
         $model->addField($field);
         (new MergeModelFiles($tmp, new ModelBuilder($tmp, 'GeoRect', $model)))->merge();
         $newContent = file_get_contents($tmp);
-        $this->assertContains('$casts', $newContent);
-        $this->assertNotContains("\n\n\n", $newContent);
-        $this->assertNotContains("{\n\n", $newContent);
+        $this->assertStringContainsString('$casts', $newContent);
+        $this->assertStringNotContainsString("\n\n\n", $newContent);
+        $this->assertStringNotContainsString("{\n\n", $newContent);
 
         // should not change
         (new MergeModelFiles($tmp, new ModelBuilder($tmp, 'GeoRect', $model)))->merge();
@@ -197,9 +197,9 @@ class GeoRect extends Model
 
         (new MergeModelFiles($tmp, new ModelBuilder($tmp, 'GeoRect', $model)))->merge();
         $newContent = file_get_contents($tmp);
-        $this->assertNotContains("\n\n\n", $newContent);
-        $this->assertNotContains("{\n\n", $newContent);
-        $this->assertContains('public function histories()', $newContent);
+        $this->assertStringNotContainsString("\n\n\n", $newContent);
+        $this->assertStringNotContainsString("{\n\n", $newContent);
+        $this->assertStringContainsString('public function histories()', $newContent);
 
         // should not change
         (new MergeModelFiles($tmp, new ModelBuilder($tmp, 'GeoRect', $model)))->merge();
@@ -221,8 +221,8 @@ class GeoRect extends Model
                 last_bought: datetime
         ');
 
-        $this->assertContains('last_bought', $this->getModelContents('Item'));
-        $this->assertContains("protected \$dates = [\n        'last_bought',\n    ];\n",
+        $this->assertStringContainsString('last_bought', $this->getModelContents('Item'));
+        $this->assertStringContainsString("protected \$dates = [\n        'last_bought',\n    ];\n",
             $this->getModelContents('Item'));
 
         $ns = $this->generateAndRun('
@@ -232,8 +232,8 @@ class GeoRect extends Model
                 last_sold: datetime
         ');
 
-        $this->assertContains('last_sold', $this->getModelContents('Item'));
-        $this->assertContains("protected \$dates = [\n        'last_bought',\n        'last_sold',\n    ];\n",
+        $this->assertStringContainsString('last_sold', $this->getModelContents('Item'));
+        $this->assertStringContainsString("protected \$dates = [\n        'last_bought',\n        'last_sold',\n    ];\n",
             $this->getModelContents('Item'));
     }
 }

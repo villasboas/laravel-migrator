@@ -132,7 +132,9 @@ class Migrator
             $fullPath = $this->schema->getPathForNamespace($model->getNamespace()).$modelFile->getFilename();
             $path = dirname($fullPath);
             if (!file_exists($path)) {
-                mkdir($path, 0755, true);
+                if (!mkdir($path, 0755, true) && !is_dir($path)) {
+                    throw new \RuntimeException(sprintf('Directory "%s" was not created', $path));
+                }
             }
 
             $contents = $modelFile->render();

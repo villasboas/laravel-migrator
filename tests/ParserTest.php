@@ -14,7 +14,7 @@ class ParserTest extends BaseTestCase
     /** @var Schema */
     public $parsed;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
     }
