@@ -100,7 +100,7 @@ class MethodCommand extends Command
             } elseif (preg_match($inverseOfRx, $tag, $m1)) {
                 $this->setInverseOf(data_get($m1, 'inverse_of'));
             } elseif (preg_match($asRx, $tag, $m1)) {
-                $this->setAs(data_get($m1, 'as1', '') . data_get($m1, 'as2', ''));
+                $this->setAs(data_get($m1, 'as1', '').data_get($m1, 'as2', ''));
             } elseif (preg_match($pivotWithTimestampsRx, $tag, $m1)) {
                 $this->pivotWithTimestamps = true;
             } elseif (preg_match($notNullRx, $tag, $m1)) {
@@ -343,7 +343,7 @@ class MethodCommand extends Command
             // skip, if there is not other method - then we can do nothing here
         }
 
-        return Str::singular($this->name) . '_id';
+        return Str::singular($this->name).'_id';
     }
 
     public function isBelongsFieldDefault()
@@ -487,7 +487,7 @@ class MethodCommand extends Command
     {
         if (!$this->returnType) {
             if ($this->name == Str::plural($this->name)) {
-                return Str::studly(Str::singular($this->name)) . '[]';
+                return Str::studly(Str::singular($this->name)).'[]';
             } else {
                 return Str::studly($this->name);
             }
@@ -843,7 +843,7 @@ class MethodCommand extends Command
             return;
         }
 
-        return Str::singular($this->name) . '_id';
+        return Str::singular($this->name).'_id';
     }
 
     public function getPivotTableDefinitionFields()

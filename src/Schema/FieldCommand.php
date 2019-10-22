@@ -43,7 +43,7 @@ class FieldCommand extends Command
             return;
         }
 
-        $fieldType = data_get($m, 'type', '') . data_get($m, 'numbered_type', '') . data_get($m, 'enum_type', '');
+        $fieldType = data_get($m, 'type', '').data_get($m, 'numbered_type', '').data_get($m, 'enum_type', '');
 
         $d = new self($m['name'], $fieldType);
         $d->setModel($model);
