@@ -14,9 +14,9 @@ class MigrationFile
 
         $n = 0;
         do {
-            $class = 'Create' . Str::studly($t->getName()) . 'Table' . ($n > 0 ? "{$n}" : '');
+            $class = 'Create'.Str::studly($t->getName()).'Table'.($n > 0 ? "{$n}" : '');
             if ($isChange) {
-                $class = 'Update' . Str::studly($t->getName()) . 'Table' . ($n > 0 ? "{$n}" : '');
+                $class = 'Update'.Str::studly($t->getName()).'Table'.($n > 0 ? "{$n}" : '');
             }
             $n++;
         } while (isset($classes[$class]) || class_exists($class) || self::classFileExists($class));
@@ -35,7 +35,7 @@ class MigrationFile
      */
     public static function classFileExists($class): bool
     {
-        return count(glob(database_path('migrations/*_' . Str::snake($class) . '.php'))) > 0;
+        return count(glob(database_path('migrations/*_'.Str::snake($class).'.php'))) > 0;
     }
 
     /**
